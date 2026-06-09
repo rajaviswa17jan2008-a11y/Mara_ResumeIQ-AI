@@ -21,6 +21,20 @@ const resumeSchema = new mongoose.Schema(
       location: { type: String, default: "" },
       summary: { type: String, default: "" },
       skills: [{ type: String }],
+      atsScore: {
+  type: Number,
+  default: 0
+},
+
+feedback: {
+  type: Object,
+  default: {}
+},
+
+recommendations: {
+  type: Array,
+  default: []
+},
       education: [
         {
           degree: String,

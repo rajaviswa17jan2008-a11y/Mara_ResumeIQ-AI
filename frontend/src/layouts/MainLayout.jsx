@@ -26,7 +26,7 @@ const NAV_ITEMS = [
   { path: '/chat',       icon: MessageSquare,   label: 'Career Chat',   group: 'tools' },
   { path: '/reports',    icon: BarChart3,       label: 'Reports',       group: 'account' },
   { path: '/profile',    icon: User,            label: 'Profile',       group: 'account' },
-  { path: '/settings',   icon: Settings,        label: 'Settings',      group: 'account' },
+  
 ]
 
 const ADMIN_ITEMS = [

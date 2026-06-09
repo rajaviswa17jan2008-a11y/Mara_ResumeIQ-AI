@@ -23,7 +23,8 @@ const jobRoutes = require("./routes/job.routes");
 const chatbotRoutes = require("./routes/chatbot.routes");
 const interviewRoutes = require("./routes/interview.routes");
 const profileRoutes = require("./routes/profile.routes");
-
+const portfolioRoutes =
+  require("./routes/portfolio.routes");
 const app = express();
 
 // ─── Security ──────────────────────────────────────────────────────────────────
@@ -102,6 +103,10 @@ app.use(
   require(
     "./routes/interview.routes"
   )
+);
+app.use(
+  "/api/portfolio",
+  portfolioRoutes
 );
 
 // ─── 404 ───────────────────────────────────────────────────────────────────────

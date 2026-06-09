@@ -3,9 +3,9 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Briefcase, MapPin, Clock, DollarSign, ExternalLink, Search, Zap, Star } from "lucide-react";
 import DashboardLayout from "../layouts/DashboardLayout";
-import { fetchJobs } from "../services/jobAPI";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { api } from "../services/api";
 const activeResume =
 
   JSON.parse(
@@ -42,12 +42,12 @@ const [initialLoad, setInitialLoad] = useState(true);
  const [saved, setSaved] =
  useState(new Set());
  useEffect(() => {
-  const cachedJobs = localStorage.getItem("recommendedJobs");
+ // const cachedJobs = localStorage.getItem("recommendedJobs");
 
-if (cachedJobs) {
-  setJobs(JSON.parse(cachedJobs));
-  setLoading(false);
-}
+//if (cachedJobs) {
+ // setJobs(JSON.parse(cachedJobs));
+ // setLoading(false);
+//}
 
   const loadJobs = async () => {
     setLoading(true);
@@ -62,8 +62,10 @@ if (cachedJobs) {
 }
 
     const resumeSkills = (
-      storedResume.skills || []
-    ).map(skill =>
+  storedResume.skills ||
+  storedResume.parsedData?.skills ||
+  []
+).map(skill =>
 
       typeof skill === "string"
         ? skill.toLowerCase()
@@ -74,11 +76,12 @@ if (cachedJobs) {
       "RESUME SKILLS:",
       resumeSkills
     );
-
+console.log("STORED RESUME:", storedResume);
+console.log("TARGET ROLE:", storedResume.targetRole);
     const searchQuery =
-  resumeSkills.length > 0
-    ? resumeSkills.slice(0, 3).join(" ")
-    : "software developer";
+  storedResume.targetRole ||
+  resumeSkills.slice(0, 3).join(" ") ||
+  "software developer";
 
     console.log(
       "SEARCH QUERY:",
@@ -88,7 +91,21 @@ if (cachedJobs) {
    let apiJobs = [];
 
 try {
-  apiJobs = await fetchJobs(searchQuery);
+  const { data } = await api.post(
+  "/jobs/recommend",
+  {
+    resumeText:
+      storedResume.rawText ||
+      JSON.stringify(storedResume)
+  }
+);
+console.log("FULL RESPONSE =", data);
+console.log("DATA.DATA =", data.data);
+console.log("DATA.DATA.JOBS =", data.data?.jobs);
+
+apiJobs = data.data.jobs || [];
+  console.log("API JOBS COUNT:", apiJobs?.length);
+console.log("API JOBS:", apiJobs);
 } catch (err) {
   console.log(err);
 }
@@ -108,41 +125,42 @@ setLoading(false);
     const scoredJobs =
   apiJobs.slice(0, 12).map((job, index) => {
 
-        const description =
-          (
-            job.job_description || ""
-          ).toLowerCase();
+        const fullText = `
+${job.title || ""}
+${job.reason || ""}
+`.toLowerCase();
 
+const title =
+(job.title || "").toLowerCase();
         let score = 0;
 
-        resumeSkills.forEach(skill => {
+resumeSkills.forEach(skill => {
 
-          if (
-            description.includes(skill)
-          ) {
-            score += 10;
-          }
+  if (title.includes(skill)) {
+    score += 30;
+  }
 
-        });
+  if (fullText.includes(skill)) {
+    score += 20;
+  }
+
+});
 
         return {
 
-          id:
-            job.job_id || index,
+         id:
+ `${index}-${job.title}`,
+title:
+ job.title,
 
-          title:
-            job.job_title,
-
-          company:
-            job.employer_name,
+company:
+ "AI Recommended",
 
           location:
-            job.job_city ||
-            "Remote",
+  "Remote",
 
           type:
-            job.job_employment_type ||
-            "Full-time",
+  "Full-time",
 
           salary:
   job.job_min_salary && job.job_max_salary
@@ -153,19 +171,19 @@ setLoading(false);
             "Recently",
 
           logo:
-            job.employer_name?.[0] || "A",
+  job.title?.[0] || "A",
 
           color:
             "from-cyan-500 to-blue-700",
 
           match:
-            Math.min(score, 100),
+ job.matchScore || 75,
 
           skills:
             resumeSkills.slice(0, 4),
 
           description:
-            job.job_description
+ job.reason
 
         };
 
@@ -179,13 +197,10 @@ setLoading(false);
 
 setJobs(sortedJobs);
 setInitialLoad(false);
-
 localStorage.setItem(
   "recommendedJobs",
-
   JSON.stringify(sortedJobs)
 );
-
 setLoading(false);
 
 };
@@ -228,8 +243,11 @@ const statsCards = [
     title: "Skills Found",
 
     value:
-      activeResume?.skills
-        ?.length || 0,
+      (
+  activeResume?.skills ||
+  activeResume?.parsedData?.skills ||
+  []
+).length,
 
     suffix: "skills"
 

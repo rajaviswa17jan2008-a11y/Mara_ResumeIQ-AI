@@ -3,53 +3,32 @@ const express = require("express");
 const router = express.Router();
 
 const User = require("../models/user");
-
+const {
+  protect
+} = require(
+  "../middleware/auth.middleware"
+);
 
 // SAVE PROFILE
 router.post(
   "/save",
-
+  protect,
   async (req, res) => {
-
     try {
 
-      const {
-        email,
-        ...updateData
-      } = req.body;
-
       const updatedUser =
-        await User.findOneAndUpdate(
-
-          { email },
-
-          updateData,
-
+        await User.findByIdAndUpdate(
+          req.user._id,
+          req.body,
           {
             new: true,
             runValidators: true,
           }
-
         );
 
-      if (!updatedUser) {
-
-        return res.status(404).json({
-
-          success: false,
-
-          message: "User not found",
-
-        });
-
-      }
-
       res.json({
-
         success: true,
-
         user: updatedUser,
-
       });
 
     } catch (error) {
@@ -57,71 +36,32 @@ router.post(
       console.error(error);
 
       res.status(500).json({
-
         success: false,
-
-        message:
-          "Profile update failed",
-
+        message: "Profile update failed",
       });
 
     }
-
   }
-
 );
 
 
 // GET PROFILE
 router.get(
   "/me",
+  protect,
 
   async (req, res) => {
 
     try {
 
-      const email =
-        req.query.email;
-
-      if (!email) {
-
-        return res.status(400)
-        .json({
-
-          success: false,
-
-          message:
-            "Email required"
-
-        });
-
-      }
-
       const user =
-        await User.findOne({
-          email
-        });
-
-      if (!user) {
-
-        return res.status(404)
-        .json({
-
-          success: false,
-
-          message:
-            "User not found"
-
-        });
-
-      }
+        await User.findById(
+          req.user._id
+        );
 
       res.json({
-
         success: true,
-
         user
-
       });
 
     } catch (error) {
@@ -129,15 +69,11 @@ router.get(
       console.error(error);
 
       res.status(500).json({
-
         success: false
-
       });
 
     }
 
   }
-
 );
-
 module.exports = router;

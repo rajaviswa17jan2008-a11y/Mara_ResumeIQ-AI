@@ -1,32 +1,57 @@
+const fs = require("fs");
 const pdfParse = require("pdf-parse");
 const mammoth = require("mammoth");
-const axios = require("axios");
 const extractSkills = require("../utils/extractSkills");
- 
+
 /**
  * Parse resume file to extract raw text and structured data
  */
-const parseResumeFromURL = async (fileUrl, fileType) => {
+const parseResumeFromURL = async (filePath, fileType) => {
+
   try {
-    // Download file buffer from Cloudinary URL
-    const response = await axios.get(fileUrl, { responseType: "arraybuffer" });
-    const buffer = Buffer.from(response.data);
- 
+
+    console.log("FILE PATH =", filePath);
+
+    // Read local uploaded file
+    const buffer = fs.readFileSync(filePath);
+
     let rawText = "";
- 
+
     if (fileType === "pdf") {
-      const pdfData = await pdfParse(buffer);
+
+      const pdfData =
+        await pdfParse(buffer);
+
       rawText = pdfData.text;
+
     } else if (fileType === "docx") {
-      const result = await mammoth.extractRawText({ buffer });
+
+      const result =
+        await mammoth.extractRawText({
+          buffer,
+        });
+
       rawText = result.value;
     }
- 
-    const structuredData = extractStructuredData(rawText);
-    return { rawText, parsedData: structuredData };
+
+    const structuredData =
+      extractStructuredData(rawText);
+
+    return {
+      rawText,
+      parsedData: structuredData,
+    };
+
   } catch (error) {
-    console.error("Resume parsing error:", error.message);
-    throw new Error(`Failed to parse resume: ${error.message}`);
+
+    console.error(
+      "Resume parsing error:",
+      error
+    );
+
+    throw new Error(
+      `Failed to parse resume: ${error.message}`
+    );
   }
 };
  
@@ -193,7 +218,9 @@ const extractProjects = (text) => {
   });
  
   if (current) projects.push(current);
- 
+ const safeProjects = Array.isArray(projects)
+  ? projects
+  : Object.values(projects || {});
   return projects.slice(0, 6).map((p) => ({
     ...p,
     technologies: extractSkills(p.description).slice(0, 6),

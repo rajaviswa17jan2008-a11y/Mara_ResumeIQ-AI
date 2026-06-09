@@ -10,15 +10,34 @@ import {
 
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, to: "/dashboard" },
+
   { label: "Upload Resume", icon: Upload, to: "/upload" },
+
   { label: "AI Analysis", icon: Cpu, to: "/analysis" },
+
   { label: "Skills", icon: Lightbulb, to: "/skills" },
-  { label: "Jobs", icon: Briefcase, to: "/jobs" },
-  { label: "Resume Maker", icon: FileEdit, to: "/builder" },
+
+  { label: "Job Recommendations", icon: Briefcase, to: "/jobs" },
+
+  { label: "Resume Builder", icon: FileEdit, to: "/builder" },
+
+  // NEW
+  { label: "Resume Improvements", icon: BarChart2, to: "/resume-improvement" },
+    // NEW
+  { label: "Portfolio Templates", icon: LayoutDashboard, to: "/portfolio-templates" },
+  // NEW
+  { label: "Portfolio AI", icon: Briefcase, to: "/portfolio-generator" },
+
+  // NEW
+  { label: "Portfolio Preview", icon: Cpu, to: "/portfolio-preview" },
+
+  
+
   { label: "Interview AI", icon: Mic, to: "/interview" },
+
   { label: "AI Chatbot", icon: MessageSquare, to: "/chatbot" },
+
   { label: "Profile", icon: User, to: "/profile" },
-  { label: "Settings", icon: Settings, to: "/settings" },
 ];
 
 export default function DashboardLayout({ children }) {
@@ -26,7 +45,7 @@ export default function DashboardLayout({ children }) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const avatar =
-  localStorage.getItem("avatar");
+  user?.avatar?.url;
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -39,23 +58,20 @@ export default function DashboardLayout({ children }) {
       {/* Logo */}
       <div className={`flex items-center gap-3 px-4 py-5 border-b border-white/[0.06] ${collapsed ? "justify-center" : ""}`}>
         <div className="
-w-9
-h-9
-rounded-2xl
-
-bg-gradient-to-br
-from-cyan-400
-via-blue-500
-to-purple-600
-
-shadow-[0_0_35px_rgba(59,130,246,0.45)]
-
 flex
 items-center
 justify-center
 flex-shrink-0
 ">
-          <span className="text-white font-black text-xs">R</span>
+          <img
+  src="/logo3.png"
+  alt="Mara ResumeIQ"
+  className="
+  w-10
+  h-10
+  object-contain
+  "
+/>
         </div>
         {!collapsed && <span className="
 text-transparent
@@ -64,12 +80,11 @@ bg-gradient-to-r
 from-cyan-300
 via-blue-400
 to-purple-400
-
 font-black
 text-xl
 tracking-tight
 ">
-ResumeIQ
+Mara ResumeIQ
 </span>}
       </div>
 
@@ -336,10 +351,31 @@ opacity-80
             <Menu size={22} />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center">
-              <span className="text-white font-black text-xs">R</span>
+            <div className="
+flex
+items-center
+justify-center
+">
+              <img
+  src="/logo2.png"
+  alt="Mara ResumeIQ"
+  className="
+  w-8
+  h-8
+  object-contain
+  "
+/>
             </div>
-            <span className="text-white font-bold">ResumeIQ</span>
+            <span className="
+font-bold
+bg-gradient-to-r
+from-cyan-300
+to-purple-400
+bg-clip-text
+text-transparent
+">
+Mara ResumeIQ
+</span>
           </div>
           <button className="relative text-white/50 hover:text-white">
             <Bell size={20} />

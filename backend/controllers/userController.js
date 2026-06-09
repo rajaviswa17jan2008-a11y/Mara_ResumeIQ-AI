@@ -76,15 +76,19 @@ const uploadAvatar = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
  
   // Delete old avatar from Cloudinary
-  if (user.avatar?.public_id) {
-    await deleteFromCloudinary(user.avatar.public_id, "image");
-  }
+  //if (user.avatar?.public_id) {
+    //await deleteFromCloudinary(user.avatar.public_id, "image");
+  //}
  
   user.avatar = {
-    public_id: req.file.filename || req.file.public_id,
-    url: req.file.path,
-  };
+  public_id: req.file.filename,
+  url: req.file.path,
+};
   await user.save({ validateBeforeSave: false });
+  console.log(
+  "AVATAR SAVED:",
+  user.avatar
+);
  
   res.status(200).json({ success: true, message: "Avatar updated.", data: { avatar: user.avatar } });
 });

@@ -33,16 +33,51 @@ const sendEmail = async ({ to, subject, html }) => {
 // @route   POST /api/auth/register
 // @access  Public
 const register = asyncHandler(async (req, res) => {
+   console.log("REGISTER BODY =", req.body);
   const { name, email, password } = req.body;
  
   if (!name || !email || !password) {
+    console.log("MISSING DATA");
     return res.status(400).json({ success: false, message: "Please provide name, email, and password." });
   }
  
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    return res.status(400).json({ success: false, message: "Email already registered. Please login." });
+    const existingUser = await User.findOne({ email });
+
+if (existingUser) {
+
+  // User already verified
+  if (existingUser.isVerified) {
+    return res.status(400).json({
+      success: false,
+      message: "Email already registered. Please login."
+    });
   }
+
+  // User not verified yet
+  const otp = existingUser.generateOTP();
+
+  await existingUser.save({
+    validateBeforeSave: false
+  });
+
+  await sendEmail({
+    to: existingUser.email,
+    subject: "🚀 Verify your ResumeIQ account",
+    html: `
+      <h2>Your OTP is:</h2>
+      <h1>${otp}</h1>
+    `
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "OTP resent successfully.",
+    data: {
+      userId: existingUser._id,
+      email: existingUser.email
+    }
+  });
+}
  
   const user = await User.create({ name, email, password });
   const otp = user.generateOTP();
@@ -85,11 +120,17 @@ const register = asyncHandler(async (req, res) => {
 // @access  Public
 const verifyOTP = asyncHandler(async (req, res) => {
   const { userId, otp } = req.body;
+ console.log("USER ID =", userId);
+  console.log("OTP FROM FRONTEND =", otp);
+
+  const user = await User.findById(userId)
+    .select("+otp.code +otp.expiresAt");
+     console.log("OTP FROM DB =", user?.otp?.code);
  
-  const user = await User.findById(userId).select("+otp");
+
   if (!user) return res.status(404).json({ success: false, message: "User not found." });
  
-  if (!user.otp?.code || user.otp.code !== otp) {
+  if (!user.otp?.code || String(user.otp.code) !== String(otp)) {
     return res.status(400).json({ success: false, message: "Invalid OTP." });
   }
  
@@ -130,7 +171,20 @@ const login = asyncHandler(async (req, res) => {
     return res.status(403).json({ success: false, message: `Account locked. Try again in ${remainingMins} minutes.` });
   }
  
-  const isMatch = await user.comparePassword(password);
+  console.log(
+  "LOGIN PASSWORD =",
+  password
+);
+
+console.log(
+  "DB HASH =",
+  user.password
+);
+
+const isMatch =
+  await user.comparePassword(
+    password
+  );
   console.log(
   "PASSWORD MATCH:",
   isMatch
@@ -146,6 +200,10 @@ const login = asyncHandler(async (req, res) => {
   }
  
   if (!user.isVerified) {
+    console.log(
+  "IS VERIFIED =",
+  user.isVerified
+);
     return res.status(403).json({ success: false, message: "Please verify your email before logging in." });
   }
  
@@ -208,6 +266,8 @@ const getMe = asyncHandler(async (req, res) => {
 // @route   POST /api/auth/forgot-password
 // @access  Public
 const forgotPassword = asyncHandler(async (req, res) => {
+  console.log("FORGOT EMAIL =", req.body.email);
+console.log("CLIENT_URL =", CLIENT_URL);
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
     return res.status(200).json({ success: true, message: "If that email is registered, a reset link has been sent." });
@@ -217,7 +277,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
   await user.save({ validateBeforeSave: false });
  
   const resetUrl = `${CLIENT_URL}/reset-password/${resetToken}`;
- 
+ console.log("RESET URL =", resetUrl);
   try {
     await sendEmail({
       to: user.email,
@@ -233,11 +293,22 @@ const forgotPassword = asyncHandler(async (req, res) => {
     });
     res.status(200).json({ success: true, message: "Password reset link sent to your email." });
   } catch (error) {
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
-    await user.save({ validateBeforeSave: false });
-    return res.status(500).json({ success: false, message: "Email could not be sent." });
-  }
+
+  console.error("EMAIL ERROR:", error);
+
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+
+  await user.save({
+    validateBeforeSave: false
+  });
+
+  return res.status(500).json({
+    success: false,
+    message: error.message
+  });
+
+}
 });
  
 // @desc    Reset password
@@ -255,12 +326,27 @@ const resetPassword = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, message: "Invalid or expired reset token." });
   }
  
-  user.password = req.body.password;
-  user.resetPasswordToken = undefined;
-  user.resetPasswordExpire = undefined;
-  await user.save();
+  console.log(
+  "NEW PASSWORD =",
+  req.body.password
+);
+
+user.password = req.body.password;
+
+user.resetPasswordToken = undefined;
+user.resetPasswordExpire = undefined;
+
+await user.save();
+
+console.log(
+  "PASSWORD SAVED"
+);
  
-  sendTokenResponse(user, 200, res, "Password reset successful!");
+  res.status(200).json({
+  success: true,
+  message:
+    "Password reset successful. Please login with your new password."
+});
 });
  
 // @desc    Resend OTP

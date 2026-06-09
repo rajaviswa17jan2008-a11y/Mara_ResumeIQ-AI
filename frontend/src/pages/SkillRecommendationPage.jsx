@@ -39,67 +39,51 @@ export default function SkillRecommendationPage() {
       "activeResume"
     )
   );
-useEffect(() => {
+      useEffect(() => {
 
   const storedResume = JSON.parse(
     localStorage.getItem("activeResume")
   );
 
+  if (!storedResume) {
+    setData(emptySkills);
+    return;
+  }
+
+  const blockedWords = [
+    "software engineer",
+    "frontend developer",
+    "full stack developer",
+    "developer",
+    "engineer",
+    "intern",
+    "fresher",
+    "student",
+    "career objective",
+    "objective"
+  ];
+
+  const extractedSkills =
+    (storedResume?.skills || [])
+      .filter(skill => {
+
+        const skillName =
+          typeof skill === "string"
+            ? skill.toLowerCase()
+            : skill.name?.toLowerCase();
+
+        return !blockedWords.some(word =>
+          skillName?.includes(word)
+        );
+      });
+
   console.log(
-    "STORED RESUME:",
-    storedResume
+    "EXTRACTED SKILLS:",
+    extractedSkills
   );
 
-  if (!storedResume) {
-
-   setData(emptySkills);
-
-    return;
-
-  }
-const blockedWords = [
-
-  "software engineer",
-  "frontend developer",
-  "full stack developer",
-  "developer",
-  "engineer",
-  "intern",
-  "fresher",
-  "student",
-  "career objective",
-  "objective"
-
-];
-
-const extractedSkills =
-
-  (storedResume.skills || []).filter(skill => {
-
-    const skillName =
-
-      typeof skill === "string"
-
-        ? skill.toLowerCase()
-
-        : skill.name?.toLowerCase();
-
-    return !blockedWords.some(word =>
-
-      skillName?.includes(word)
-
-    );
-
-  });
-
-//const uniqueSkills =
-
-  //[...new Set(cleanSkills)];
-
-const formattedSkills =
-
+  const formattedSkills =
     extractedSkills.map(skill => ({
-
       name:
         typeof skill === "string"
           ? skill
@@ -112,16 +96,12 @@ const formattedSkills =
         typeof skill === "object"
           ? skill.category || "Skill"
           : "Skill"
-
     }));
 
   setData({
-
     current: formattedSkills,
-
     recommended:
       storedResume.recommendations || []
-
   });
 
 }, []);

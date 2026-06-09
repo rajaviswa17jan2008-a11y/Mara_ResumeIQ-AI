@@ -13,7 +13,6 @@ const ACCEPTED = { "application/pdf": [".pdf"], "application/msword": [".doc"], 
 export default function ResumeUploadPage() {
   const navigate = useNavigate();
   const [file, setFile] = useState(null);
-  const [storedResume, setStoredResume] = useState(null);
   const [uploadState, setUploadState] = useState("idle"); // idle | uploading | processing | done | error
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
@@ -98,17 +97,21 @@ console.log(
 
 localStorage.setItem(
   "activeResume",
-
   JSON.stringify({
+    rawText: analysis.rawText || "",
 
-    rawText:
-      analysis.rawText,
+    atsScore: analysis.atsScore || 0,
 
-    atsScore:
-      analysis.atsScore,
+    feedback: analysis.feedback || {},
 
-    feedback:
-      analysis.feedback,
+    summaryFeedback:
+      analysis.feedback?.summary || "",
+
+    strengths:
+      analysis.feedback?.strengths || [],
+
+    improvementTips:
+      analysis.feedback?.improvements || [],
 
     skills:
       analysis.skills || [],
@@ -117,43 +120,17 @@ localStorage.setItem(
       analysis.recommendations || [],
 
     jobs:
-  JSON.parse(
-    localStorage.getItem(
-      "recommendedJobs"
-    )
-  ) || [],
+      JSON.parse(
+        localStorage.getItem("recommendedJobs")
+      ) || [],
 
     targetRole:
-      analysis.targetRole
-
+      analysis.targetRole || ""
   })
 );
       
-   const latestResume = {
+   
 
-  fileName: file.name,
-
-  fileSize:
-    (file.size / 1024 / 1024).toFixed(2),
-
-  uploadedAt:
-    new Date().toLocaleString()
-
-};
-
-setStoredResume(
-  latestResume
-);
-
-localStorage.setItem(
-
-  "storedResume",
-
-  JSON.stringify(
-    latestResume
-  )
-
-);
   setProgress(100);
 setProgress(96);
 
@@ -200,22 +177,17 @@ await new Promise(resolve =>
 
   const processingSteps = ["Extracting text content", "Parsing sections", "Analyzing skills", "Calculating ATS score", "Generating insights"];
 
-     useEffect(() => {
+    // useEffect(() => {
 
-  const savedResume =
-    localStorage.getItem(
-      "storedResume"
-    );
+ // if (savedResume) {
 
-  if (savedResume) {
+    //setStoredResume(
+      //JSON.parse(savedResume)
+    //);
 
-    setStoredResume(
-      JSON.parse(savedResume)
-    );
+  //}
 
-  }
-
-}, []);
+//}, []);
 useEffect(() => {
   let interval;
 
@@ -338,222 +310,50 @@ after:bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gra
 
 after:bg-[size:40px_40px]
 ">
-      <div className="max-w-3xl mx-auto relative z-10">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="mb-8">
-            <h1 className="
-text-5xl
-font-black
-tracking-tight
+            <div className="text-center mb-14">
 
-bg-gradient-to-r
-from-cyan-300
-via-blue-400
-to-purple-500
+<div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-cyan-400/30 bg-cyan-400/5 mb-6">
 
-bg-clip-text
-text-transparent
+<span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
 
-drop-shadow-[0_0_35px_rgba(34,211,238,0.35)]
-">Upload Resume</h1>
-            <p className="
-text-white/60
-text-lg
-mt-3
-tracking-wide
-">Upload your resume for AI-powered analysis</p>
-          </div>
-          
-         {
-  storedResume && (
+<span className="text-cyan-400 text-xs font-mono tracking-widest uppercase">
 
-    <motion.div
+AI Resume Engine v2.0
 
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
+</span>
 
-      className="
+</div>
 
-      mt-6
-      relative
-      overflow-hidden
+<h1 className="text-5xl md:text-6xl font-extrabold mb-4">
 
-      rounded-[28px]
+<span className="text-white">Resume </span>
 
-      border
-      border-cyan-400/20
+<span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
 
-      bg-white/[0.04]
-      backdrop-blur-2xl
+Intelligence
 
-      p-6
+</span>
 
-      shadow-[0_0_60px_rgba(6,182,212,0.08)]
+</h1>
 
-      hover:border-cyan-400/40
-      hover:shadow-[0_0_80px_rgba(6,182,212,0.15)]
+<p className="text-gray-400 text-lg max-w-2xl mx-auto">
 
-      transition-all
-      duration-500
-      "
-    >
+Upload your resume. Our AI analyzes ATS compatibility, grammar, missing keywords and delivers improvement insights.
 
-      {/* top glow line */}
-
-      <div className="
-      absolute
-      top-0
-      left-0
-      w-full
-      h-[2px]
-
-      bg-gradient-to-r
-      from-cyan-400
-      via-blue-500
-      to-purple-500
-      " />
-
-      <div className="flex items-start gap-4">
-
-        {/* icon */}
-
-        <div className="
-        w-14
-        h-14
-
-        rounded-2xl
-
-        bg-gradient-to-br
-        from-cyan-500/20
-        to-purple-500/20
-
-        border
-        border-cyan-400/20
-
-        flex
-        items-center
-        justify-center
-        shrink-0
-        ">
-
-          <FileText
-            size={26}
-            className="text-cyan-400"
-          />
-
-        </div>
-
-        {/* content */}
-
-        <div className="flex-1 min-w-0">
-
-          <div className="
-          flex
-          items-center
-          justify-between
-          gap-3
-          ">
-
-            <div>
-
-              <h3 className="
-              text-cyan-300
-              font-bold
-              text-lg
-              tracking-wide
-              ">
-                Current Stored Resume
-              </h3>
-
-              <p className="
-              text-white
-              font-medium
-              text-base
-              mt-2
-              truncate
-              ">
-                {storedResume.fileName}
-              </p>
-
-            </div>
-
-            <div className="
-            px-3
-            py-1
-
-            rounded-full
-
-            bg-emerald-500/10
-            border
-            border-emerald-400/20
-
-            text-emerald-400
-            text-xs
-            font-semibold
-            ">
-              ACTIVE
-             
-
-
-            </div>
-
-          </div>
-
-          <div className="
-          mt-4
-          flex
-          items-center
-          gap-2
-
-          text-emerald-400
-          text-sm
-          ">
-
-            <CheckCircle size={16} />
-
-            Resume synced with AI engine
-          
-
-          </div>
-
-          <div className="
-          mt-3
-          text-white/40
-          text-xs
-          tracking-wide
-          ">
-            Only latest resume stored • Old resumes auto replaced
-            <div className="
-mt-4
-flex
-items-center
-gap-4
-
-text-xs
-text-white/40
-">
-
-  <span>
-    {storedResume.fileSize} MB
-  </span>
-
-  <span>
-    {storedResume.uploadedAt}
-  </span>
+</p>
 
 </div>
           </div>
+          
 
-        </div>
-
-      </div>
-
-    </motion.div>
-
-  )
-}
-
-          <div className="mt-10">
+          <div className="
+mt-10
+max-w-4xl
+mx-auto
+">
 
   <AnimatePresence mode="wait">
             {(
@@ -561,53 +361,13 @@ text-white/40
   uploadState === "error"
 ) && (
               <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                <div {...getRootProps()} className={`
-
-group
-relative
-
-border
-border-cyan-400/20
-
-rounded-[32px]
-
-py-28
-px-16
-
-overflow-hidden
-
-bg-white/[0.03]
-backdrop-blur-2xl
-
-shadow-[0_0_80px_rgba(6,182,212,0.08)]
-
-transition-all
-duration-500
-
-hover:border-cyan-400/40
-hover:shadow-[0_0_100px_rgba(6,182,212,0.18)]
-
-${
-  isDragActive
-    ? "scale-[1.02] border-cyan-300 bg-cyan-500/10"
-    : ""
-}
-
-`}>
-  <div className="
-absolute
-top-0
-left-0
-w-full
-h-[2px]
-
-bg-gradient-to-r
-from-cyan-400
-via-blue-500
-to-purple-500
-
-opacity-80
-" />
+                <div
+              {...getRootProps()}
+              className={`relative cursor-pointer rounded-2xl border-2 border-dashed transition-all duration-300 p-10 text-center group
+                ${isDragActive ? "border-[#00f0ff] bg-[#00f0ff]/10 shadow-[0_0_40px_#00f0ff30]" :  file? "border-white/10 bg-white/[0.03]" : "border-[#ffffff15] bg-[#ffffff03] hover:border-[#bf00ff]/50 hover:bg-[#bf00ff]/5 hover:shadow-[0_0_30px_#bf00ff20]"}
+              `}
+            >
+ 
                   <input {...getInputProps()} />
                   <motion.div animate={{ y: isDragActive ? -8 : 0 }} transition={{ type: "spring", stiffness: 300 }}>
                     <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 border border-indigo-500/20 flex items-center justify-center mx-auto mb-6">
@@ -626,7 +386,19 @@ opacity-80
 
                 {file && (
                   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                    className="mt-4 bg-white/[0.04] border border-white/10 rounded-xl p-4 flex items-center gap-4">
+                           className="
+mt-4
+max-w-4xl
+mx-auto
+bg-white/[0.04]
+border
+border-white/10
+rounded-xl
+p-4
+flex
+items-center
+gap-4
+" >
                     <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center">
                       <FileText size={18} className="text-indigo-400" />
                     </div>
@@ -649,18 +421,20 @@ opacity-80
                 <motion.button
                   onClick={handleUpload} disabled={!file}
                   whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
-                  className="
-
+                className="
 group
 relative
 
 mt-8
+
 w-full
+md:w-[450px]
+
+mx-auto
+block
 
 overflow-hidden
-
 rounded-2xl
-
 py-5
 
 bg-gradient-to-r
@@ -672,19 +446,8 @@ text-white
 font-bold
 text-lg
 
-shadow-[0_0_50px_rgba(59,130,246,0.35)]
-
-hover:scale-[1.01]
-hover:shadow-[0_0_80px_rgba(59,130,246,0.5)]
-
-transition-all
-duration-500
-
-disabled:opacity-40
-disabled:cursor-not-allowed
-
 ">
-                  <Sparkles size={18} /> Analyze with AI
+                  <Sparkles size={18} /> ⚡ Analyze Resume
                 </motion.button>
               </motion.div>
             )}
@@ -771,7 +534,17 @@ ${active
           </div>
 
           {/* Tips */}
-          <div className="mt-8 grid grid-cols-3 gap-4">
+          <div className="
+mt-8
+max-w-3xl
+mx-auto
+
+grid
+grid-cols-1
+md:grid-cols-3
+
+gap-4
+">
             {[
               { title: "ATS Score", desc: "Get your applicant tracking score" },
               { title: "Skill Map", desc: "Discover your skill profile" },
@@ -790,9 +563,8 @@ backdrop-blur-2xl
 border
 border-cyan-400/10
 
-rounded-3xl
-
-p-6
+rounded-2xl
+p-4
 
 transition-all
 duration-500

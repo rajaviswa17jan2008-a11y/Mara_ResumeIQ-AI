@@ -166,34 +166,28 @@ const handleDownload = async () => {
 
   if (!element) return;
 
-  const opt = {
+ 
+const opt = {
+  margin: 0.1,
 
-    margin: 0.2,
+  filename: `${resume.personalInfo.name || "Resume"}_Resume.pdf`,
 
-    filename: `${resume.personalInfo.name || "Resume"}_Resume.pdf`,
+  image: {
+    type: "jpeg",
+    quality: 1,
+  },
 
-    image: {
-      type: "jpeg",
-      quality: 0.98,
-    },
+  html2canvas: {
+  scale: 1,
+  useCORS: true,
+},
 
-    html2canvas: {
-      scale: 3,
-      useCORS: true,
-    },
-
-    jsPDF: {
-      unit: "mm",
-      format: "a4",
-      orientation: "portrait",
-    },
-
-    pagebreak: {
-      mode: ["avoid-all"]
-    }
-
-  };
-
+  jsPDF: {
+    unit: "mm",
+    format: "a4",
+    orientation: "portrait",
+  }
+};
   await html2pdf()
     .set(opt)
     .from(element)
@@ -576,7 +570,20 @@ gap-4">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-white font-semibold">Work Experience</h3>
-                <button onClick={() => addItem("experience", { company: "", title: "", startDate: "", endDate: "", current: false, bullets: [""] })}
+                <button
+  onClick={() => {
+    if (resume.experience.length >= 2) return;
+
+    addItem("experience", {
+      company: "",
+      title: "",
+      startDate: "",
+      endDate: "",
+      current: false,
+      bullets: [""]
+    });
+  }}
+
                   className="flex items-center gap-1.5 text-xs text-white/60 border border-white/10 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-all">
                   <Plus size={12} />Add
                 </button>
@@ -707,7 +714,18 @@ duration-500
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-white font-semibold">Projects</h3>
-                <button onClick={() => addItem("projects", { name: "", url: "", description: "", tech: "" })}
+                <button
+  onClick={() => {
+    if (resume.projects.length >= 2) return;
+
+    addItem("projects", {
+      name: "",
+      url: "",
+      description: "",
+      tech: ""
+    });
+  }}
+
                   className="flex items-center gap-1.5 text-xs text-white/60 border border-white/10 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-all"><Plus size={12} />Add</button>
               </div>
               {resume.projects.map((p, i) => (
@@ -745,7 +763,17 @@ duration-500
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-white font-semibold">Certifications</h3>
-                <button onClick={() => addItem("certifications", { name: "", issuer: "", date: "" })}
+               <button
+  onClick={() => {
+    if (resume.certifications.length >= 2) return;
+
+    addItem("certifications", {
+      name: "",
+      issuer: "",
+      date: ""
+    });
+  }}
+
                   className="flex items-center gap-1.5 text-xs text-white/60 border border-white/10 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-all"><Plus size={12} />Add</button>
               </div>
               {resume.certifications.map((c, i) => (
@@ -791,10 +819,14 @@ duration-500
 >
 <div
   id="resume-preview"
+  style={{
+  transform: "scale(0.80)",
+  transformOrigin: "top left"
+}}
   className={`
     font-sans
     w-full
-max-w-[950px]
+max-w-[850px]
 
 overflow-hidden
     transition-all duration-500
@@ -827,8 +859,7 @@ md:grid-cols-3
 ">
 
   {/* SIDEBAR */}
-
-  <div className="bg-slate-900 text-white p-8 sticky top-4">
+  <div className="bg-gradient-to-b from-[#0f172a] via-[#111827] to-[#020617] text-white p-8">
 
     <div className="mb-10">
 
@@ -838,8 +869,8 @@ md:grid-cols-3
     src={profileImage}
     alt="Profile"
     className="
-      w-28
-      h-28
+      w-20
+h-20
       rounded-full
       object-cover
       border-4
@@ -878,11 +909,13 @@ md:grid-cols-3
     <Mail size={16} />
     <span>{resume.personalInfo.email}</span>
   </div>
+  
 
   <div className="flex items-center gap-2">
     <Phone size={16} />
     <span>{resume.personalInfo.phone}</span>
   </div>
+  
 
   <div className="flex items-center gap-2">
     <MapPin size={16} />
@@ -900,6 +933,10 @@ md:grid-cols-3
     <Link size={16} />
     <span>{resume.personalInfo.website}</span>
   </div>
+  <div className="flex items-center gap-2">
+  <GitBranch size={16} />
+  <span>{resume.personalInfo.github}</span>
+</div>
 
 </div>
 </div>
@@ -922,7 +959,7 @@ md:grid-cols-3
 
           <span
             key={i}
-            className="bg-slate-700 px-3 py-1 rounded-full text-xs"
+            className="bg-cyan-500/20 border border-cyan-400/30 px-3 py-1 rounded-full text-xs font-medium"
           >
             {skill}
           </span>
@@ -938,25 +975,21 @@ md:grid-cols-3
   {/* MAIN CONTENT */}
 
   <div className="
-col-span-2
-
-p-5
-sm:p-8
-lg:p-10
+   col-span-2
+p-4
+sm:p-5
+lg:p-6
 ">
 
     {/* SUMMARY */}
 
-    <section
-  className="mb-10"
-  style={{ pageBreakInside: "avoid" }}
->
+    <section className="mb-6">
 
       <h2 className="text-2xl font-bold text-slate-800 mb-4 border-b pb-2">
         Professional Summary
       </h2>
 
-      <p className="text-gray-700 leading-8">
+      <p className="text-gray-700 leading-6 text-sm">
         {resume.summary}
       </p>
 
@@ -964,10 +997,7 @@ lg:p-10
 
     {/* EXPERIENCE */}
 
-    <section
-  className="mb-10"
-  style={{ pageBreakInside: "avoid" }}
->
+    <section className="mb-6">
 
       <h2 className="text-2xl font-bold text-slate-800 mb-4 border-b pb-2">
         Experience
@@ -977,7 +1007,7 @@ lg:p-10
 
         <div
           key={exp.id}
-          className="mb-6 p-5 border border-gray-200 rounded-2xl shadow-sm"
+          className="mb-3 p-3 border border-cyan-100 rounded-xl bg-white"
         >
 
           <h3 className="text-xl font-semibold">
@@ -1013,12 +1043,9 @@ lg:p-10
     </section>
     {/* EDUCATION */}
 
-<section
-  className="mb-10"
-  style={{ pageBreakInside: "avoid" }}
->
+<section className="mb-6">
 
-  <h2 className="text-2xl font-bold text-slate-800 mb-4 border-b pb-2">
+  <h2 className="text-xl font-bold text-slate-800 mb-4 border-b pb-2">
     Education
   </h2>
 
@@ -1026,7 +1053,7 @@ lg:p-10
 
     <div
       key={edu.id}
-      className="mb-6 p-5 border border-gray-200 rounded-2xl shadow-sm"
+      className="mb-3 p-3 border border-gray-200 rounded-xl"
     >
 
       <h3 className="text-xl font-semibold">
@@ -1055,10 +1082,7 @@ lg:p-10
 
 {/* PROJECTS */}
 
-<section
-  className="mb-10"
-  style={{ pageBreakInside: "avoid" }}
->
+    <section className="mb-6">
 
   <h2 className="text-2xl font-bold text-slate-800 mb-4 border-b pb-2">
     Projects
@@ -1068,7 +1092,7 @@ lg:p-10
 
     <div
       key={p.id}
-      className="mb-6 p-5 border border-gray-200 rounded-2xl shadow-sm"
+      className="mb-3 p-3 border border-gray-200 rounded-xl"
     >
 
       <h3 className="text-xl font-semibold">
@@ -1097,11 +1121,9 @@ lg:p-10
 
 {/* CERTIFICATIONS */}
 
-<section
-  style={{ pageBreakInside: "avoid" }}
->
+ <section className="mb-6">
 
-  <h2 className="text-2xl font-bold text-slate-800 mb-4 border-b pb-2">
+  <h2 className="text-xl font-bold text-slate-800 mb-4 border-b pb-2">
     Certifications
   </h2>
 
@@ -1236,14 +1258,11 @@ lg:p-10
 
   {/* RIGHT SIDE */}
 
-  <div className="md:col-span-8 p-12">
+  <div className="md:col-span-8 p-8">
 
     {/* SUMMARY */}
 
-    <section
-  className="mb-10"
-  style={{ pageBreakInside: "avoid" }}
->
+     <section className="mb-6">
 
       <h2 className="text-3xl font-bold mb-4 text-slate-800">
         Professional Summary
@@ -1257,10 +1276,7 @@ lg:p-10
 
     {/* EXPERIENCE */}
 
-    <section
-  className="mb-10"
-  style={{ pageBreakInside: "avoid" }}
->
+     <section className="mb-6">
 
       <h2 className="text-3xl font-bold mb-6 text-slate-800">
         Experience
@@ -1321,10 +1337,7 @@ gap-6
 
     {/* EDUCATION */}
 
-    <section
-  className="mb-10"
-  style={{ pageBreakInside: "avoid" }}
->
+    <section className="mb-6">
 
       <h2 className="text-3xl font-bold mb-6 text-slate-800">
         Education
@@ -1357,10 +1370,7 @@ gap-6
 
     {/* PROJECTS */}
 
-    <section
-  className="mb-10"
-  style={{ pageBreakInside: "avoid" }}
->
+    <section className="mb-6">
 
       <h2 className="text-3xl font-bold mb-6 text-slate-800">
         Projects
@@ -1431,7 +1441,7 @@ gap-6
 
 {template === "minimal" && (
 
-<div className="bg-white text-gray-900  px-16 py-14">
+<div className="bg-white text-gray-900 px-10 py-8">
 
   {/* HEADER */}
 
@@ -1481,10 +1491,7 @@ gap-6
 
   {/* SUMMARY */}
 
-  <section
-  className="mb-12"
-  style={{ pageBreakInside: "avoid" }}
->
+  <section className="mb-6">
 
     <h2 className="text-3xl font-extrabold tracking-tight mb-4">
       Summary
@@ -1498,10 +1505,7 @@ gap-6
 
   {/* EXPERIENCE */}
 
-  <section
-  className="mb-12"
-  style={{ pageBreakInside: "avoid" }}
->
+     <section className="mb-6">
 
     <h2 className="text-2xl font-bold mb-6">
       Experience
@@ -1549,10 +1553,7 @@ gap-6
 
   {/* SKILLS */}
 
-  <section
-  className="mb-12"
-  style={{ pageBreakInside: "avoid" }}
->
+   <section className="mb-6">
 
     <h2 className="text-2xl font-bold mb-6">
       Skills
@@ -1580,10 +1581,8 @@ gap-6
 
   {/* EDUCATION */}
 
-  <section
-  className="mb-12"
-  style={{ pageBreakInside: "avoid" }}
->
+  
+     <section className="mb-6">
 
     <h2 className="text-2xl font-bold mb-6">
       Education
@@ -1609,10 +1608,7 @@ gap-6
 
   {/* PROJECTS */}
 
-<section
-  className="mb-12"
-  style={{ pageBreakInside: "avoid" }}
->
+<section className="mb-6">
 
     <h2 className="text-2xl font-bold mb-6">
       Projects

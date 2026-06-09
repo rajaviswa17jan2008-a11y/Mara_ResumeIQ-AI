@@ -31,6 +31,9 @@ const uploadResume = asyncHandler(async (req, res) => {
   const oldResumes = await Resume.find({
   user: req.user._id
 });
+await Resume.deleteMany({
+  user: req.user._id
+});
 
 
   const file = req.file;
@@ -51,7 +54,12 @@ const uploadResume = asyncHandler(async (req, res) => {
     status: "uploaded",
   });
  
-  await User.findByIdAndUpdate(req.user._id, { $inc: { resumeCount: 1 } });
+  await User.findByIdAndUpdate(
+  req.user._id,
+  {
+    resumeCount: 1
+  }
+);
  
   // Parse resume asynchronously
  const {

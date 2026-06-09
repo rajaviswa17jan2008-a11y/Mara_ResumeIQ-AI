@@ -1,0 +1,115 @@
+/* frontend/styles/resumeImprovement.css */
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.3);
+}
+
+/* Neon glow text */
+.neon-text-cyan {
+  color: #00f0ff;
+  text-shadow: 0 0 10px #00f0ff80, 0 0 20px #00f0ff40, 0 0 40px #00f0ff20;
+}
+.neon-text-purple {
+  color: #bf00ff;
+  text-shadow: 0 0 10px #bf00ff80, 0 0 20px #bf00ff40;
+}
+.neon-text-green {
+  color: #00ff9f;
+  text-shadow: 0 0 10px #00ff9f80, 0 0 20px #00ff9f40;
+}
+
+/* Neon border glow */
+.neon-border-cyan {
+  border-color: #00f0ff;
+  box-shadow: 0 0 10px #00f0ff30, inset 0 0 10px #00f0ff10;
+}
+.neon-border-purple {
+  border-color: #bf00ff;
+  box-shadow: 0 0 10px #bf00ff30, inset 0 0 10px #bf00ff10;
+}
+
+/* Glassmorphism card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Animated gradient border */
+@keyframes borderGlow {
+  0%, 100% { box-shadow: 0 0 10px #00f0ff30; }
+  50% { box-shadow: 0 0 25px #00f0ff60, 0 0 50px #00f0ff20; }
+}
+.animated-border-glow {
+  animation: borderGlow 3s ease-in-out infinite;
+}
+
+/* Score circle pulse */
+@keyframes scorePulse {
+  0%, 100% { filter: drop-shadow(0 0 6px #00f0ff); }
+  50% { filter: drop-shadow(0 0 14px #00f0ff) drop-shadow(0 0 28px #00f0ff60); }
+}
+.score-circle-glow {
+  animation: scorePulse 2s ease-in-out infinite;
+}
+
+/* Floating background orbs */
+@keyframes floatOrb {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-20px) scale(1.05); }
+}
+.float-orb {
+  animation: floatOrb 8s ease-in-out infinite;
+}
+.float-orb-delayed {
+  animation: floatOrb 10s ease-in-out 2s infinite;
+}
+
+/* Scan line effect */
+@keyframes scanLine {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+.scan-line {
+  animation: scanLine 4s linear infinite;
+}
+
+/* Shimmer skeleton */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Keyword tag hover */
+.keyword-tag {
+  transition: all 0.2s ease;
+}
+.keyword-tag:hover {
+  transform: scale(1.05) translateY(-1px);
+}
+
+/* Loading bar */
+@keyframes loadingBar {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+.loading-bar {
+  animation: loadingBar 2s ease-out forwards;
+}

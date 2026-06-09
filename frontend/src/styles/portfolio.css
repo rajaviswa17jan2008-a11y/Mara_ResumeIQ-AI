@@ -1,0 +1,132 @@
+/* frontend/styles/portfolio.css */
+
+/* Portfolio global resets */
+.portfolio-root * {
+  box-sizing: border-box;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Portfolio section transition */
+.portfolio-section {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* Template preview container */
+.template-preview {
+  transform-origin: top center;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Cyberpunk glitch effect */
+@keyframes glitch {
+  0% { clip-path: polygon(0 2%, 100% 2%, 100% 5%, 0 5%); transform: translate(-2px); }
+  10% { clip-path: polygon(0 15%, 100% 15%, 100% 15%, 0 15%); transform: translate(2px); }
+  20% { clip-path: polygon(0 10%, 100% 10%, 100% 20%, 0 20%); transform: translate(-2px); }
+  100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); transform: translate(0); }
+}
+.glitch-effect {
+  animation: glitch 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+}
+
+/* Futuristic scanner */
+@keyframes scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.scanner-line {
+  animation: scan 3s linear infinite;
+}
+
+/* Portfolio card hover */
+.portfolio-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.portfolio-card:hover {
+  transform: translateY(-8px);
+}
+
+/* Holographic shimmer for futuristic template */
+@keyframes holographic {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.holographic-bg {
+  background: linear-gradient(270deg, #00ff9f20, #00f0ff20, #bf00ff20, #00ff9f20);
+  background-size: 400% 400%;
+  animation: holographic 6s ease infinite;
+}
+
+/* Glassmorphism utilities */
+.glass-light {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Export button pop animation */
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+.export-pop {
+  animation: pop 0.2s ease-out;
+}
+
+/* Template selector smooth switch */
+.template-enter {
+  opacity: 0;
+  transform: scale(0.97);
+}
+.template-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: all 0.3s ease;
+}
+
+/* Skills badge shimmer on hover */
+.skill-badge {
+  position: relative;
+  overflow: hidden;
+}
+.skill-badge::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transition: left 0.4s ease;
+}
+.skill-badge:hover::after {
+  left: 100%;
+}
+
+/* Portfolio preview responsive scaling */
+@media (max-width: 768px) {
+  .template-preview-container {
+    transform: scale(0.7);
+    transform-origin: top center;
+  }
+}
+
+/* Print styles for PDF export */
+@media print {
+  nav { display: none !important; }
+  .no-print { display: none !important; }
+  body { background: white !important; color: black !important; }
+}

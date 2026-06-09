@@ -30,41 +30,59 @@ const quickActions = [
   //{ action: "Interview prep", detail: "15 questions ready", time: "2d ago", icon: Star, color: "text-pink-400" },
 //];
 const recommendedJobs =
-
   JSON.parse(
     localStorage.getItem(
       "recommendedJobs"
-    )
-  ) || [];
+    ) || "[]"
+  );
+  console.log(
+  "DASHBOARD JOBS =",
+  recommendedJobs
+);
 
-const recentActivity = [
+console.log(
+  "DASHBOARD COUNT =",
+  recommendedJobs.length
+);
 
-  ...recommendedJobs
-    .slice(0, 3)
-    .map((job) => ({
 
-      action:
-        "Job matched",
 
-      detail:
-        `${job.job_title} @ ${job.employer_name}`,
-
-      time:
-        "Recently",
-
-      icon:
-        Briefcase,
-
-      color:
-        "text-cyan-400"
-
-    }))
-
-];
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const { resumes } = useResume();
+  const { resumes, activeResume } =
+  useResume();
+
+  const recentActivity = [];
+
+if (activeResume) {
+  recentActivity.push({
+    action: "Resume Uploaded",
+    detail: activeResume.fileName || "Resume uploaded",
+    time: "Recently",
+    icon: Upload,
+    color: "text-cyan-400",
+  });
+
+  recentActivity.push({
+    action: "Resume Analyzed",
+    detail: `ATS Score ${activeResume?.parsedData?.atsScore || 0}`,
+    time: "Recently",
+    icon: Cpu,
+    color: "text-purple-400",
+  });
+}
+
+if (recommendedJobs.length > 0) {
+  recentActivity.push({
+    action: "Job Matches Found",
+    detail: `${recommendedJobs.length} jobs available`,
+    time: "Recently",
+    icon: Briefcase,
+    color: "text-green-400",
+  });
+}
+
   const [greeting, setGreeting] = useState("Good morning");
 
   useEffect(() => {
@@ -73,13 +91,7 @@ export default function Dashboard() {
     else if (h >= 17) setGreeting("Good evening");
   }, []);
 
-  const activeResume =
-
-  JSON.parse(
-    localStorage.getItem(
-      "activeResume"
-    )
-  );
+  
 
   const statsCards = [
 
@@ -88,7 +100,7 @@ export default function Dashboard() {
     label: "ATS Score",
 
     value:
-      activeResume?.atsScore || 0,
+      activeResume?.parsedData?.atsScore || 0,
 
     unit: "/100",
 
@@ -103,8 +115,7 @@ export default function Dashboard() {
     label: "Skills Found",
 
     value:
-      activeResume?.skills
-        ?.length || 0,
+      activeResume?.parsedData?.skills?.length || 0,
 
     unit: "skills",
 
@@ -115,30 +126,23 @@ export default function Dashboard() {
   },
 
   {
+  label: "Job Matches",
 
-    label: "Job Matches",
+  value: recommendedJobs.length,
 
-    value:
-  JSON.parse(
-    localStorage.getItem(
-      "recommendedJobs"
-    )
-  )?.length || 0,
+  unit: "jobs",
 
-    unit: "jobs",
+  icon: Briefcase,
 
-    icon: Briefcase,
-
-    change: "+8"
-
-  },
+  change: "+8"
+},
 
   {
 
   label: "Resumes",
 
   value:
-    activeResume ? 1 : 0,
+  resumes?.length || 0,
 
   unit:
     activeResume ? "file" : "files",

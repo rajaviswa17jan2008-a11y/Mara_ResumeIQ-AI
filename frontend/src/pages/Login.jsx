@@ -1,7 +1,11 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  Navigate,
+} from "react-router-dom";
 import { motion } from "framer-motion";
-
+import { LogOut } from "lucide-react";
 import {
   Eye,
   EyeOff,
@@ -15,8 +19,11 @@ import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
 
-  const { login } = useAuth();
-
+  const {
+  login,
+  isAuthenticated
+} = useAuth();
+const navigate = useNavigate();
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -92,6 +99,14 @@ export default function Login() {
   }
 
 };
+if (isAuthenticated) {
+  return (
+    <Navigate
+      to="/dashboard"
+      replace
+    />
+  );
+}
 
   const set = (field) => (e) =>
     setForm((f) => ({
@@ -206,6 +221,92 @@ shadow-[0_0_80px_rgba(6,182,212,0.12)]
 overflow-hidden
 "
       >
+      
+         
+    <motion.button
+  type="button"
+  onClick={() => navigate("/")}
+
+  animate={{
+    boxShadow: [
+      "0 0 0px rgba(34,211,238,0)",
+      "0 0 25px rgba(34,211,238,0.5)",
+      "0 0 0px rgba(34,211,238,0)"
+    ]
+  }}
+
+  transition={{
+    duration: 2,
+    repeat: Infinity
+  }}
+
+  whileHover={{
+    scale: 1.08,
+    y: -3
+  }}
+
+  whileTap={{
+    scale: 0.92
+  }}
+
+  className="
+  absolute
+  top-2
+left-2
+  z-50
+
+  flex
+  items-center
+  gap-2
+
+  px-4
+  py-2
+
+  rounded-2xl
+
+  bg-gradient-to-r
+  from-cyan-500/20
+  via-blue-500/20
+  to-indigo-500/20
+
+  backdrop-blur-xl
+
+  border
+  border-cyan-400/30
+
+  text-cyan-300
+
+  shadow-[0_0_25px_rgba(34,211,238,0.25)]
+
+  hover:text-white
+  hover:border-cyan-400/60
+  hover:shadow-[0_0_40px_rgba(34,211,238,0.45)]
+
+  transition-all
+  duration-300
+  "
+>
+
+  <motion.div
+    animate={{
+      x: [0, -4, 0]
+    }}
+    transition={{
+      duration: 1,
+      repeat: Infinity
+    }}
+  >
+    <LogOut size={14} />
+  </motion.div>
+
+  <span className="
+text-xs
+font-medium
+">
+  Exit
+</span>
+
+</motion.button>
         <div
   className="
   absolute
@@ -234,55 +335,49 @@ overflow-hidden
 
         {/* LOGO */}
 
-        <div className="mb-8 flex items-center gap-3">
-<div
+        <div className="mt-8 mb-8 flex items-center gap-3">
+     <img
+  src="/logo2.png"
+  alt="Mara ResumeIQ"
   className="
-  relative
-
   w-14
   h-14
-
-  rounded-[20px]
-
-  bg-gradient-to-br
-  from-cyan-400
-  via-blue-500
-  to-purple-600
-
-  flex
-  items-center
-  justify-center
-
-  text-white
-  font-black
-  text-2xl
-
-  shadow-[0_0_40px_rgba(34,211,238,0.5)]
-"
->
-  R
-</div>
+  object-contain
+  drop-shadow-[0_0_20px_rgba(34,211,238,0.6)]
+  "
+/>
 
           <div>
 
-            <h2
-              className="
-              text-white
-              font-bold
-              text-xl
-            "
-            >
-              ResumeIQ AI
-            </h2>
+           <h2
+  className="
+  text-white
+  font-extrabold
+  text-xl
+  tracking-tight
+  "
+>
+  <span className="text-cyan-400">
+    Mara
+  </span>
 
-            <p
-              className="
-              text-white/40
-              text-xs
-            "
-            >
-              AI-Powered Career Intelligence Platform
-            </p>
+  <span className="text-white ml-1">
+    Resume
+  </span>
+
+  <span className="text-purple-400">
+    IQ
+  </span>
+</h2>
+
+<p
+  className="
+  text-white/40
+  text-xs
+"
+>
+  AI-Powered Resume Intelligence
+</p>
 
           </div>
 
@@ -325,10 +420,9 @@ drop-shadow-[0_0_30px_rgba(34,211,238,0.35)]
   className="
   inline-flex
   items-center
-  gap-2
-
-  px-4
-  py-2
+  px-2
+py-1
+gap-1
 
   rounded-full
 
@@ -361,6 +455,7 @@ drop-shadow-[0_0_30px_rgba(34,211,238,0.35)]
         >
 
           <button
+          
            className="
 group
 

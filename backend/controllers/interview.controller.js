@@ -1,6 +1,7 @@
-const client =
-require("../config/openrouter");
-
+const ai =
+require("../config/gemini");
+const MODELS =
+require("../config/aiModels");
 exports.generateQuestions =
 async (req, res) => {
 
@@ -47,28 +48,13 @@ Format:
 
 `;
 
-    const completion =
-await client.chat.completions.create({
-
-  model:
-    "openai/gpt-3.5-turbo",
-
-  response_format: {
-    type: "json_object"
-  },
-
-  messages: [
-    {
-      role: "user",
-      content: prompt
-    }
-  ]
-
+    const response =
+await ai.models.generateContent({
+  model: MODELS.INTERVIEW,
+  contents: prompt,
 });
 
-const text =
-completion.choices[0]
-.message.content;
+const text = response.text;
 
 const parsed =
 JSON.parse(text);
@@ -122,28 +108,15 @@ Format:
 
 `;
 
-const completion =
-await client.chat.completions.create({
 
-  model:
-    "openai/gpt-3.5-turbo",
 
-  response_format: {
-    type: "json_object"
-  },
-
-  messages: [
-    {
-      role: "user",
-      content: prompt
-    }
-  ]
-
+const response =
+await ai.models.generateContent({
+  model: MODELS.INTERVIEW,
+  contents: prompt,
 });
 
-const text =
-completion.choices[0]
-.message.content;
+const text = response.text;
 
 const parsed =
 JSON.parse(text);

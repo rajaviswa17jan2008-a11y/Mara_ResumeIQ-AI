@@ -3,7 +3,8 @@ const { extractSkillsFromText } = require("../services/skillExtractor.service");
 const { success } = require("../utils/responseHelper");
 const { AppError } = require("../utils/errorHandler");
 const asyncHandler = require("../utils/asyncHandler");
-
+const ai = require("../config/gemini");
+const MODELS = require("../config/aiModels");
 exports.matchJobs = asyncHandler(async (req, res) => {
   const { resumeText, jobs = [] } = req.body;
   if (!resumeText) throw new AppError("Resume text required", 400, "INVALID_INPUT");
@@ -46,4 +47,56 @@ exports.batchMatchAnalysis = asyncHandler(async (req, res) => {
   }));
 
   success(res, { results, skills: skills.all });
+});
+exports.recommendJobs =
+asyncHandler(async (req,res)=>{
+
+ const { resumeText } = req.body;
+
+ const skills =
+ extractSkillsFromText(
+   resumeText
+ );
+
+ const prompt = `
+Suggest 10 suitable jobs.
+
+Skills:
+${skills.all.join(", ")}
+
+Return ONLY JSON:
+
+{
+ "jobs":[
+   {
+     "title":"",
+     "matchScore":0,
+     "reason":""
+   }
+ ]
+}
+`;
+
+ const response =
+ await ai.models.generateContent({
+   model: MODELS.JOBS,
+   contents: prompt,
+ });
+
+ const text = response.text;
+
+ const jsonMatch =
+ text.match(/\{[\s\S]*\}/);
+
+ if(!jsonMatch){
+   throw new Error(
+     "No valid JSON returned"
+   );
+ }
+
+ const parsed =
+ JSON.parse(jsonMatch[0]);
+
+ success(res, parsed);
+
 });

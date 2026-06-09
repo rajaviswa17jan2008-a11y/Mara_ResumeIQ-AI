@@ -26,10 +26,9 @@ const userSchema = new mongoose.Schema(
     avatar: {
       public_id: { type: String, default: null },
       url: {
-        type: String,
-        default:
-          "https://res.cloudinary.com/demo/image/upload/v1/samples/animals/cat",
-      },
+  type: String,
+  default: "",
+},
     },
     role: {
       type: String,
@@ -110,7 +109,7 @@ userSchema.methods.getResetPasswordToken = function () {
     .createHash("sha256")
     .update(resetToken)
     .digest("hex");
-  this.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
+  this.resetPasswordExpire = Date.now() + 30 * 60 * 1000; // 10 minutes
   return resetToken;
 };
  

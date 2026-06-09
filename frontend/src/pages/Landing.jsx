@@ -124,32 +124,129 @@ top-0
 left-0
 right-0
 z-50
-bg-black/30
+bg-[#020617]/90
 backdrop-blur-2xl
 border-b
-border-cyan-500/10
+border-cyan-400/20
 shadow-[0_0_35px_rgba(6,182,212,0.08)]
 ">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="
-text-3xl
-font-black
-text-transparent
-bg-clip-text
-bg-gradient-to-r
-from-cyan-400
-via-blue-400
-to-purple-500
-tracking-wide
-drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]
+        <div className="
+px-4
+md:px-8
+py-4
+flex
+justify-between
+items-center
 ">
-            ResumeIQ AI
-          </h1>
+          <div className="
+flex
+items-center
+gap-1
+flex-1
+min-w-0
+">
 
-          <div className="flex gap-4">
-            <Link to="/login" className="text-white/70 hover:text-white">
-              Login
-            </Link>
+  <motion.img
+    src="/logo2.png"
+    alt="Mara ResumeIQ"
+    className="
+    w-8 h-8
+    sm:w-10 sm:h-10
+    md:w-16 md:h-16
+    shrink-0
+    "
+    animate={{
+      y: [0, -4, 0]
+    }}
+    transition={{
+      duration: 3,
+      repeat: Infinity
+    }}
+  />
+
+  <motion.h1
+    initial={{ opacity: 0, x: -20 }}
+    animate={{ opacity: 1, x: 0 }}
+    className="
+    text-xs
+    sm:text-lg
+    md:text-4xl
+    font-extrabold
+    truncate
+    whitespace-nowrap
+    "
+  >
+    <span className="text-cyan-400">
+      Mara
+    </span>
+
+    <span className="text-white ml-1">
+      Resume
+    </span>
+
+    <span className="text-purple-400">
+      IQ
+    </span>
+  </motion.h1>
+
+</div>
+          <div className="
+flex
+gap-2
+shrink-0
+">
+            <motion.div
+  whileHover={{
+    scale: 1.08,
+    y: -2,
+  }}
+  whileTap={{
+    scale: 0.95,
+  }}
+>
+  <Link
+    to="/login"
+    className="
+    relative
+    overflow-hidden
+    px-3
+sm:px-5
+py-2
+text-sm
+sm:text-base
+    rounded-2xl
+    border
+    border-cyan-400/20
+    bg-white/[0.03]
+    backdrop-blur-xl
+    text-white
+    font-semibold
+    transition-all
+    duration-300
+    hover:border-cyan-400/50
+    hover:shadow-[0_0_30px_rgba(34,211,238,0.35)]
+    "
+  >
+    <span className="relative z-10">
+      Login
+    </span>
+
+    <span
+      className="
+      absolute
+      inset-0
+      bg-gradient-to-r
+      from-cyan-500/20
+      via-blue-500/20
+      to-purple-500/20
+      opacity-0
+      hover:opacity-100
+      transition-opacity
+      duration-500
+      "
+    />
+  </Link>
+</motion.div>
 
             <Link
               to="/signup"
@@ -159,8 +256,9 @@ from-cyan-500
 via-blue-500
 to-purple-600
 text-white
-px-5
-py-2.5
+px-3
+sm:px-5
+py-2
 rounded-2xl
 font-semibold
 hover:scale-105
@@ -176,11 +274,23 @@ shadow-[0_0_35px_rgba(59,130,246,0.35)]
       </nav>
 
       {/* Hero */}
-      <section className="min-h-screen flex items-center justify-center text-center px-6">
+      <section
+className="
+min-h-screen
+flex
+items-center
+justify-center
+text-center
+px-4
+sm:px-6
+pt-24
+"
+>
         <motion.div style={{ y: heroY }}>
           <h1 className="
-text-6xl
-md:text-8xl
+text-3xl
+sm:text-4xl
+md:text-6xl
 font-black
 leading-tight
 mb-6
@@ -201,12 +311,25 @@ animate-pulse
             </span>
           </h1>
 
-          <p className="text-white/60 text-lg max-w-2xl mx-auto mb-8">
+          <p className="
+text-white/60
+text-base
+md:text-lg
+px-2
+ max-w-2xl mx-auto mb-8">
             AI-powered resume analyzer with ATS score,
             skill gap detection, and smart career insights.
           </p>
 
-          <div className="flex flex-col md:flex-row gap-4 justify-center">
+          <div className="
+flex
+flex-col
+sm:flex-row
+gap-4
+justify-center
+items-center
+w-full
+">
             <Link
               to="/signup"
               className="
@@ -215,8 +338,11 @@ from-cyan-500
 via-blue-500
 to-purple-600
 text-white
+w-full
+sm:w-auto
 px-8
 py-4
+justify-center
 rounded-2xl
 font-bold
 flex
@@ -239,6 +365,8 @@ bg-white/[0.03]
 backdrop-blur-2xl
 px-8
 py-4
+w-full
+sm:w-auto
 rounded-2xl
 flex
 items-center
@@ -254,7 +382,16 @@ duration-300
             </button>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16">
+          <div className="
+grid
+grid-cols-1
+sm:grid-cols-2
+lg:grid-cols-4
+gap-4
+mt-16
+mb-16
+sm:grid-cols-2
+lg:grid-cols-4 gap-4 mt-16">
             {STATS.map((stat) => (
               <div
                 key={stat.label}
@@ -296,7 +433,15 @@ duration-500
             Features
           </h2>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="
+grid
+grid-cols-1
+sm:grid-cols-2
+lg:grid-cols-3
+gap-4
+mt-16
+mb-12
+">
             {FEATURES.map((feature) => (
               <div
                 key={feature.title}
@@ -309,7 +454,8 @@ backdrop-blur-2xl
 border
 border-purple-500/20
 rounded-3xl
-p-8
+p-6
+md:p-8
 hover:border-cyan-400/40
 hover:-translate-y-2
 hover:shadow-[0_0_50px_rgba(6,182,212,0.18)]
@@ -338,7 +484,15 @@ opacity-70
                   {feature.title}
                 </h3>
 
-                <p className="text-white/60">
+                <p className="
+text-white/60
+text-sm
+sm:text-base
+md:text-lg
+max-w-2xl
+mx-auto
+mb-8
+">
                   {feature.desc}
                 </p>
               </div>

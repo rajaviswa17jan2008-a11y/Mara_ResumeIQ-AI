@@ -1,5 +1,7 @@
-const client =
-require("../config/openrouter");
+const ai =
+require("../config/gemini");
+const MODELS =
+require("../config/aiModels");
 const { buildChatSystemPrompt } = require("../utils/promptBuilder");
 const { logger } = require("../utils/logger");
 
@@ -43,7 +45,7 @@ Example:
 },
 
     ...conversationHistory
-      .slice(-12)
+      .slice(-5)
       .filter(m => m.role && m.content)
       .map(m => ({
         role:
@@ -61,44 +63,32 @@ Example:
   ];
 
   try {
-  const completion =
-await client.chat.completions.create({
-
-  model:
-    "openai/gpt-3.5-turbo",
-
-  temperature: 0.3,
-
-  max_tokens: 350,
-
-  messages: messages.map(m => ({
-
-    role:
-      m.role === "model"
-        ? "assistant"
-        : m.role,
-
-    content: m.content,
-
-  })),
-
+   const response =
+await ai.models.generateContent({
+  model: MODELS.CHATBOT,
+  contents: messages
+    .map(m => `${m.role}: ${m.content}`)
+    .join("\n\n"),
 });
 
-return completion
-  .choices[0]
-  .message.content;
+return response.text;
    
   } catch (err) {
 
-    logger.error(
-      "OpenRouter chat failed:",
-      err.message
-    );
+  console.log(
+    "FULL GEMINI ERROR:",
+    err
+  );
 
-    throw new Error(
-      "AI service temporarily unavailable."
-    );
-  }
+  logger.error(
+    "Gemini chat failed:",
+    err.message
+  );
+
+  throw new Error(
+    "AI service temporarily unavailable."
+  );
+}
 }
 
 async function streamChatbotResponse(
@@ -126,9 +116,9 @@ async function streamChatbotResponse(
   } catch (err) {
 
     logger.error(
-      "OpenRouter stream failed:",
-      err.message
-    );
+  "Gemini stream failed:",
+  err.message
+);
 
     throw err;
   }

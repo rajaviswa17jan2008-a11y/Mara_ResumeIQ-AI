@@ -49,12 +49,16 @@ const [form, setForm] = useState({
 
 }, [user]);
  
-  
+  useEffect(() => {
+  if (user?.avatar?.url) {
+    setAvatar(user.avatar.url);
+  } else {
+    setAvatar(null);
+  }
+}, [user]);
   const [success, setSuccess] = useState("");
 const [avatar, setAvatar] = useState(
-
-  localStorage.getItem("avatar") || null
-
+  user?.avatar?.url || null
 );
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -70,11 +74,6 @@ const [avatar, setAvatar] = useState(
 
     setAvatar(reader.result);
 
-    localStorage.setItem(
-      "avatar",
-      reader.result
-    );
-
   };
 
   reader.readAsDataURL(file);
@@ -85,6 +84,7 @@ const [avatar, setAvatar] = useState(
   setSaving(true);
 
   try {
+    
    const updatedForm = {
   ...form,
   name: form.name?.trim() || "User",
@@ -112,13 +112,40 @@ const res = await userAPI.updateProfile({
   res.data.user
 );
 
-    
-    setUser(res.data.user);
+    let avatarUrl = avatar;
 
-    
-    localStorage.setItem(
+if (avatar && avatar.startsWith("data:image")) {
+  const formData = new FormData();
+
+  const blob =
+    await fetch(avatar).then(r => r.blob());
+
+  formData.append(
+    "avatar",
+    blob,
+    "avatar.jpg"
+  );
+
+  const avatarRes =
+    await userAPI.uploadAvatar(formData);
+
+  avatarUrl =
+    avatarRes.data.data.avatar.url;
+}
+
+setAvatar(avatarUrl);
+    const updatedUser = {
+  ...res.data.user,
+  avatar: {
+    url: avatarUrl
+  }
+};
+
+setUser(updatedUser);
+
+localStorage.setItem(
   "user",
-  JSON.stringify(res.data.user)
+  JSON.stringify(updatedUser)
 );
 
 setForm({
@@ -144,6 +171,10 @@ setForm({
     }, 3000);
 
   } catch (err) {
+    console.log(
+    "PROFILE UPDATE ERROR:",
+    err.response?.data
+  );
 
   console.log(err);
 
@@ -469,10 +500,13 @@ drop-shadow-[0_0_25px_rgba(34,211,238,0.35)]
           font-black
         ">
 
-         {avatar ? (
-
+         {avatar || user?.avatar?.url ? (
   <img
-    src={avatar}
+    src={
+  avatar ||
+  user?.avatar?.url ||
+  ""
+}
     alt="avatar"
     className="
       w-full
@@ -480,11 +514,8 @@ drop-shadow-[0_0_25px_rgba(34,211,238,0.35)]
       object-cover
     "
   />
-
 ) : (
-
   user?.name?.[0] || "U"
-
 )}
 
         </div>

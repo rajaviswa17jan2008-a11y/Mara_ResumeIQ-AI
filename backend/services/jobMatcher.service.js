@@ -1,5 +1,8 @@
-const client =
-require("../config/openrouter");
+const ai =
+require("../config/gemini");
+
+const MODELS =
+require("../config/aiModels");
 const { safeParseJSON, ensureObject } = require("../utils/jsonParser");
 const { buildJobMatchPrompt } = require("../utils/promptBuilder");
 const logger = require("../utils/logger");
@@ -111,32 +114,14 @@ Return format:
   recommendation: "No recommendation available",
   tailoringSuggestions: [],
 };
-const completion =
-await client.chat.completions.create({
 
-  model:
-    "openai/gpt-3.5-turbo",
-
-  temperature: 0.1,
-
-  max_tokens: 700,
-
-  messages: [
-    {
-      role: "user",
-      content: prompt,
-    },
-  ],
-
+const response =
+await ai.models.generateContent({
+  model: MODELS.JOBS,
+  contents: prompt,
 });
 
-const raw =
-completion.choices[0]
-.message.content;
-console.log(
-  "JOB MATCH AI:",
-  raw
-);
+const raw = response.text;
 
 const cleaned = raw
   .replace(/```json/g, "")

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react'
+import React, { createContext, useContext, useState, useCallback,useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { resumeAPI } from '../services/api'
 import { aiAPI } from '../services/aiApi'
@@ -32,8 +32,14 @@ export const ResumeProvider = ({ children }) => {
 
     console.log("UPLOAD API RESPONSE:", data)
 
-    setResumes(prev => [data, ...prev])
-    setActiveResume(data)
+    setResumes(prev => [
+  data.resume,
+  ...prev
+]);
+
+setActiveResume(
+  data.resume
+);
 
     localStorage.setItem(
       "resumeData",
@@ -98,12 +104,35 @@ export const ResumeProvider = ({ children }) => {
     }
   }, [])
 
-  const fetchResumes = useCallback(async () => {
-    try {
-      const { data } = await resumeAPI.getAll()
-      setResumes(data.resumes)
-    } catch {/* silent */}
-  }, [])
+ const fetchResumes = useCallback(async () => {
+  try {
+
+    const { data } =
+      await resumeAPI.getAll();
+
+    setResumes(
+  data.data?.resumes || []
+);
+
+    if (
+      data.data?.resumes?.length
+    ) {
+      setActiveResume(
+        data.data.resumes[0]
+      );
+    }
+
+  } catch (err) {
+
+    console.log(err);
+
+  }
+}, []);
+useEffect(() => {
+
+  fetchResumes();
+
+}, [fetchResumes]);
 
   const deleteResume = useCallback(async (resumeId) => {
     try {

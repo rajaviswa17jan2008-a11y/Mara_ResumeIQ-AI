@@ -70,20 +70,19 @@ if (!token) return;
         const res =
           await userAPI
           .getProfile()
+          console.log(
+  "PROFILE API USER:",
+  res.data.user
+);
 
         if (res.data.user) {
 
-  const mergedUser = {
-    ...savedUser,
-    ...res.data.user,
-  };
+  setUser(res.data.user);
 
-  setUser(mergedUser);
-
-  localStorage.setItem(
-    "user",
-    JSON.stringify(mergedUser)
-  );
+localStorage.setItem(
+  "user",
+  JSON.stringify(res.data.user)
+);
 
 }
 
@@ -123,7 +122,22 @@ if (!token) return;
         "user",
         JSON.stringify(data.user)
       );
+       localStorage.setItem(
+  "resumeiq_token",
+  data.token
+);
 
+localStorage.setItem(
+  "user",
+  JSON.stringify(data.user)
+);
+localStorage.removeItem("recommendedJobs");
+localStorage.removeItem("storedResume");
+localStorage.removeItem("activeResume");
+localStorage.removeItem("analysisData");
+localStorage.removeItem("avatar");
+
+setUser(data.user);
       setUser(data.user);
 
       toast.success(
@@ -154,33 +168,36 @@ if (!token) return;
   [navigate]
 );
 
-  const signup = useCallback(async (userData) => {
+  const signup = useCallback(
+  async (userData) => {
     try {
-      const { data } = await authAPI.register(userData);
 
-      localStorage.setItem(
-        "resumeiq_token",
-        data.token
+      const { data } =
+        await authAPI.register(
+          userData
+        );
+     console.log(data);
+      localStorage.removeItem(
+        "resumeiq_token"
       );
 
-      setUser(data.user);
-      console.log(
-  "LOGIN USER:",
-  data.user
-);
-      localStorage.setItem(
-  "user",
-  JSON.stringify(data.user)
-);
-
-      toast.success(
-        "Account created successfully 🚀"
+      localStorage.removeItem(
+        "user"
       );
 
-      navigate("/dashboard");
+      setUser(null);
 
-      return { success: true };
+       toast.success(
+  "OTP sent to your email 📧"
+);
+
+return {
+  success: true,
+  data: data.data
+};
+
     } catch (err) {
+
       const msg =
         err.response?.data?.message ||
         "Registration failed";
@@ -189,18 +206,20 @@ if (!token) return;
 
       return {
         success: false,
-        error: msg,
+        error: msg
       };
+
     }
-  }, [navigate]);
+  },
+  [navigate]
+);
 
   const logout = useCallback(() => {
-    localStorage.removeItem("resumeiq_token");
-    localStorage.removeItem("user");
+    localStorage.clear();
 
     setUser(null);
 
-    navigate("/login");
+    
 
     toast.success("Logged out successfully");
   }, [navigate]);

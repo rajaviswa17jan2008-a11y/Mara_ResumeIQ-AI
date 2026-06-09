@@ -1,5 +1,7 @@
-const client =
-require("../config/openrouter");
+const ai =
+require("../config/gemini");
+const MODELS =
+require("../config/aiModels");
 const cacheMiddleware = require("../middleware/cache.middleware");
 const cache = cacheMiddleware.cache;
 const { safeParseJSON, ensureArray, ensureObject } = require("../utils/jsonParser");
@@ -8,35 +10,15 @@ const { logger } =
 require("../utils/logger");
 const crypto = require("crypto");
 async function callAI(
-  prompt,
-  options = {}
+  prompt
 ) {
 
-  const completion =
-  await client.chat.completions.create({
-
-    model:
-      "openai/gpt-3.5-turbo",
-
-    temperature:
-      options.temperature || 0.5,
-
-    max_tokens:
-      options.max_tokens || 1000,
-
-    messages: [
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-
-  });
-
-  return completion
-    .choices[0]
-    .message.content;
-
+  const response =
+await ai.models.generateContent({
+  model: MODELS.INTERVIEW,
+  contents: prompt,
+});
+  return response.text;
 }
 
 

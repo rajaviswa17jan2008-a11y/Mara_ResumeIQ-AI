@@ -17,7 +17,6 @@ import {
   RefreshCw
 } from "lucide-react";
 import { ArrowLeft } from "lucide-react";
-
 const ScanLine = () => (
   <motion.div
     className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent pointer-events-none"
@@ -56,28 +55,23 @@ export default function AIAnalysisPage() {
       try {
 
         console.log("ACTIVE RESUME:", activeResume);
-      const analysisData = {
+      
+const analysisData = {
 
   atsScore:
-    activeResume?.atsScore || 0,
+    activeResume?.overallScore ||
+    activeResume?.atsScore ||
+    0,
 
   strengths:
-    activeResume?.feedback
-      ?.strengths || [],
+    activeResume?.strengths || [],
 
   improvements:
-    activeResume?.feedback
-      ?.improvements || [],
+    activeResume?.improvementTips || [],
 
   summary:
-    activeResume?.summary ||
-
-    activeResume?.feedback?.summary ||
-
-    "",
-
+    activeResume?.summaryFeedback || "",
 };
-
 setAnalysis(analysisData);
 
 console.log(
@@ -568,7 +562,9 @@ sm:text-base
               className="text-emerald-400 mt-0.5"
             />
 
-            <p>{item}</p>
+            <p>
+  {item.area || item}
+</p>
 
           </div>
 
@@ -612,7 +608,9 @@ hover:-translate-y-1
               className="text-red-400 mt-0.5"
             />
 
-            <p>{item}</p>
+            <p>
+  {item.tip || item}
+</p>
 
           </div>
 

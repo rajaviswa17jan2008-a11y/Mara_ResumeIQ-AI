@@ -1,6 +1,7 @@
-const client =
-require("../config/openrouter");
- 
+const ai =
+require("../config/gemini");
+ const MODELS =
+require("../config/aiModels");
 /**
  * Fallback resume analysis with Gemini
  */
@@ -53,29 +54,14 @@ Return this exact JSON structure:
     }
   ]
 }`;
- 
-   const completion =
-await client.chat.completions.create({
-
-  model:
-    "openai/gpt-3.5-turbo",
-
-  temperature: 0.3,
-
-  max_tokens: 2000,
-
-  messages: [
-    {
-      role: "user",
-      content: prompt,
-    },
-  ],
-
+ const response =
+await ai.models.generateContent({
+  model: MODELS.ANALYSIS,
+  contents: prompt,
 });
 
-const text =
-completion.choices[0]
-.message.content;
+const text = response.text;
+
  
     // Extract JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -83,8 +69,8 @@ completion.choices[0]
  
     return JSON.parse(jsonMatch[0]);
   } catch (error) {
-    console.error("OpenRouter Analysis Error:", error.message);
-    throw new Error(`OpenRouter analysis failed: ${error.message}`);
+    console.error("Gemini Analysis Error:", error.message);
+throw new Error(`Gemini analysis failed: ${error.message}`);
   }
 };
  
@@ -96,47 +82,33 @@ const chatWithGeminiBot = async (messages, resumeContext = "") => {
  
     const systemContext = `You are ResumeIQ AI, an expert career coach. Help with resumes, job search, skills, and career development.
 ${resumeContext ? `User's resume context: ${resumeContext}` : ""}`;
- const completion =
-await client.chat.completions.create({
+ const prompt = `
+${systemContext}
 
-  model:
-    "meta-llama/llama-3.1-8b-instruct:free",
+${messages
+  .map(
+    (m) =>
+      `${m.role}: ${m.content}`
+  )
+  .join("\n")}
+`;
 
-  temperature: 0.5,
-
-  max_tokens: 1000,
-
-  messages: [
-
-    {
-      role: "system",
-      content: systemContext,
-    },
-
-    ...messages.map((m) => ({
-
-      role:
-        m.role === "assistant"
-          ? "assistant"
-          : "user",
-
-      content: m.content,
-
-    })),
-
-  ],
-
+const response =
+await ai.models.generateContent({
+  model: MODELS.CHATBOT,
+  contents: prompt,
 });
 
-const text =
-completion.choices[0]
-.message.content;
+const text = response.text;
  
     return { content: text, tokens: Math.floor(text.length / 4) };
   } catch (error) {
-    console.error("OpenRouter Chat Error:", error.message);
-    throw new Error(`OpenRouter chat failed: ${error.message}`);
+    console.error("Gemini Chat Error:", error.message);
+throw new Error(`Gemini chat failed: ${error.message}`);
   }
 };
  
-module.exports = { analyzeResumeWithAI,chatWithAIBot };
+module.exports ={
+  analyzeResumeWithGemini,
+  chatWithGeminiBot,
+}; 

@@ -1,49 +1,42 @@
-const multer = require("multer");
-const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../config/cloudinary");
 const {
-  CLOUDINARY_CLOUD_NAME,
-  CLOUDINARY_API_KEY,
-  CLOUDINARY_API_SECRET,
-} = require("../config/env");
- 
-cloudinary.config({
-  cloud_name: CLOUDINARY_CLOUD_NAME,
-  api_key: CLOUDINARY_API_KEY,
-  api_secret: CLOUDINARY_API_SECRET,
-});
- 
+  CloudinaryStorage
+} = require("multer-storage-cloudinary");
+const multer = require("multer");
 // Resume storage
-const resumeStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: "resumeiq/resumes",
-    resource_type: "raw",
 
-    public_id: (req, file) => {
-      const userId = req.user?._id || "anonymous";
-      const timestamp = Date.now();
+ const path = require("path");
 
-      const originalName = file.originalname
-        .replace(/\.[^/.]+$/, "")
-        .replace(/\s+/g, "_");
+const resumeStorage =
+  multer.diskStorage({
 
-      return `${userId}_${originalName}_${timestamp}`;
+    destination: function (
+      req,
+      file,
+      cb
+    ) {
+
+      cb(null, "uploads/");
+
     },
-  },
+
+    filename: function (
+      req,
+      file,
+      cb
+    ) {
+
+      cb(
+        null,
+        Date.now() +
+        path.extname(file.originalname)
+      );
+
+    },
+
 });
- 
 // Avatar storage
-const avatarStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: "resumeiq/avatars",
-    resource_type: "image",
-    allowed_formats: ["jpg", "jpeg", "png", "webp"],
-    transformation: [{ width: 400, height: 400, crop: "fill", quality: "auto" }],
-    public_id: (req, file) => `avatar_${req.user._id}_${Date.now()}`,
-  },
-});
+
  
 const fileFilter = (allowedTypes) => (req, file, cb) => {
   if (allowedTypes.includes(file.mimetype)) {
@@ -63,19 +56,28 @@ const uploadResume = multer({
   ]),
 });
  
+const avatarStorage =
+  new CloudinaryStorage({
+    cloudinary,
+    params: {
+      folder: "resumeiq-avatars",
+      allowed_formats: [
+        "jpg",
+        "jpeg",
+        "png",
+        "webp"
+      ],
+    },
+  });
+
 const uploadAvatar = multer({
   storage: avatarStorage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
-  fileFilter: fileFilter(["image/jpeg", "image/png", "image/jpg", "image/webp"]),
+  limits: { fileSize: 5 * 1024 * 1024 },
 });
  
-const deleteFromCloudinary = async (publicId, resourceType = "raw") => {
-  try {
-    await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
-  } catch (error) {
-    console.error("Cloudinary delete error:", error.message);
-  }
-};
  
-module.exports = { uploadResume, uploadAvatar, deleteFromCloudinary, cloudinary };
+module.exports = {
+  uploadResume,
+  uploadAvatar
+};
  

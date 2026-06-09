@@ -67,9 +67,16 @@ export const authAPI = {
   login:          (data)    => api.post('/auth/login', data),
   register:       (data)    => api.post('/auth/register', data),
   getMe:          (token)   => api.get('/auth/me', { headers: { Authorization: `Bearer ${token}` } }),
-
+verifyOTP: (data) =>
+    api.post('/auth/verify-otp', data),
   forgotPassword: (data)    => api.post('/auth/forgot-password', data),
-  resetPassword:  (data)    => api.post('/auth/reset-password', data),
+ 
+
+resetPassword: (token, data) =>
+  api.put(
+    `/auth/reset-password/${token}`,
+    data
+  ),
  changePassword: (data) =>
   api.put(
     "/users/change-password",
@@ -77,11 +84,7 @@ export const authAPI = {
   ),
   uploadAvatar:   (form)    => api.post('/auth/avatar', form, { headers: { 'Content-Type': 'multipart/form-data' } }),
   deleteAccount:  ()        => api.delete('/auth/account'),
-  updateSettings: (data) =>
-  api.put(
-    "/users/settings",
-    data
-  ),
+  
 }
  
 // ─── Resume API ────────────────────────────────────────────────────────
@@ -112,23 +115,24 @@ export const dashboardAPI = {
 }
  
 // ─── User API ─────────────────────────────────────────────────────────
-export const userAPI = {
 
+export const userAPI = {
   getProfile: () =>
     api.get("/users/profile"),
 
   updateProfile: (data) =>
     api.put("/users/profile", data),
-
-  getSettings: () =>
-    api.get("/users/settings"),
-
-  updateSettings: (data) =>
-    api.put("/users/settings", data),
-
-  getActivity: () =>
-    api.get("/users/activity"),
-
+uploadAvatar: (formData) =>
+  api.put(
+    "/users/avatar",
+    formData,
+    {
+      headers: {
+        "Content-Type":
+          "multipart/form-data"
+      },
+    }
+  ),
 }
 // ─── Admin API ────────────────────────────────────────────────────────
 export const adminAPI = {
@@ -184,13 +188,6 @@ export const reportsAPI = {
 api.post(
 "/interview/questions",
 data
-),
-
-generateInterviewFeedback:
-(data) =>
-api.post(
-"/interview/feedback",
-
 ),
 
   // REAL AI FEEDBACK
