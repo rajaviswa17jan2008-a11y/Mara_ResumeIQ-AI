@@ -3,7 +3,7 @@ const Resume = require("../models/resume");
 const Analysis = require("../models/Analysis");
 const { asyncHandler } = require("../middleware/errorMiddleware");
 const { deleteFromCloudinary } = require("../middleware/uploadMiddleware");
- 
+const cloudinary = require("../config/cloudinary");
 // @desc    Get user profile
 // @route   GET /api/users/profile
 // @access  Private
@@ -80,11 +80,22 @@ const uploadAvatar = asyncHandler(async (req, res) => {
     //await deleteFromCloudinary(user.avatar.public_id, "image");
   //}
  
-  user.avatar = {
-  public_id: req.file.filename,
-  url: req.file.path,
+ const result =
+  await cloudinary.uploader.upload(
+    req.file.path,
+    {
+      folder: "resumeiq/avatar",
+    }
+  );
+
+user.avatar = {
+  public_id: result.public_id,
+  url: result.secure_url,
 };
-  await user.save({ validateBeforeSave: false });
+
+await user.save({
+  validateBeforeSave: false,
+});
   console.log(
   "AVATAR SAVED:",
   user.avatar

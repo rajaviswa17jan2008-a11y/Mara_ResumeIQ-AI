@@ -3,10 +3,11 @@ const { MONGO_URI } = require("./env");
  
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    const dns = require("dns");
+   dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
+    
+    const conn = await mongoose.connect(MONGO_URI);
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
  
     mongoose.connection.on("error", (err) => {
