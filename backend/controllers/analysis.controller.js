@@ -14,7 +14,7 @@ const {
   extractName,
 } = require("../services/resumeParser.service");
 
-const { success } = require("../utils/ResponseHelper");
+const { success } = require("../utils/responseHelper");
 
 const { AppError } = require("../utils/errorHandler");
 
