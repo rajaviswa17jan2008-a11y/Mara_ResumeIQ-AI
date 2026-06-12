@@ -7,7 +7,7 @@ const api = axios.create({
   baseURL: API_BASE,
   headers: { "Content-Type": "application/json" },
 });
-
+                                
 /**
  * Generate a portfolio from form data
  * @param {Object} formData - Portfolio form data (name, title, skills, projects, etc.)
