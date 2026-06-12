@@ -3,10 +3,10 @@ import toast from 'react-hot-toast'
 
  
 // ─── Axios Instances ──────────────────────────────────────────────────
-const BASE_URL    = import.meta.env.VITE_API_URL    || 'http://localhost:5001/api'
+const BASE_URL    = import.meta.env.VITE_API_URL    || 'https://mara-resumeiq-ai.onrender.com'
 const AI_BASE_URL =
   import.meta.env.VITE_AI_API_URL ||
-  'http://localhost:5001/api'
+  'https://mara-resumeiq-ai.onrender.com'
  
  
 const authHeaders = () => ({
