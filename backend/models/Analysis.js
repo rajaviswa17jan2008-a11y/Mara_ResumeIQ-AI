@@ -8,7 +8,7 @@ const analysisSchema = new mongoose.Schema(
       required: true,
     },
     resume: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId, 
       ref: "Resume",
       required: true,
     },

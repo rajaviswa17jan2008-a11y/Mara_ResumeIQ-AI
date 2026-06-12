@@ -1,6 +1,6 @@
 const User = require("../models/user");
 const Resume = require("../models/resume");
-const Analysis = require("../models/Analysis");
+const Analysis = require("../models/analysis");
 const { asyncHandler } = require("../middleware/errorMiddleware");
 const { deleteFromCloudinary } = require("../middleware/uploadMiddleware");
 const cloudinary = require("../config/cloudinary");
