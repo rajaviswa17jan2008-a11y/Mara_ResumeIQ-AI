@@ -354,7 +354,7 @@ duration-300
 shadow-[0_0_45px_rgba(59,130,246,0.35)]
 "
             >
-              Start Free
+              Sign Up
               <ArrowRight size={18} />
             </Link>
 
