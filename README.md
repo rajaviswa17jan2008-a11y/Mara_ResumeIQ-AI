@@ -53,7 +53,7 @@ The platform uses Artificial Intelligence to analyze resumes, calculate ATS scor
 ## 🌐 Live Demo
 
 ### Frontend
-https://mararesume-iq-ai.vercel.app
+https://mararesume-iqai.vercel.app
 
 ### Backend
 https://mara-resumeiq-ai.onrender.com
