@@ -279,18 +279,7 @@ console.log("CLIENT_URL =", CLIENT_URL);
   const resetUrl = `${CLIENT_URL}/reset-password/${resetToken}`;
  console.log("RESET URL =", resetUrl);
   try {
-    await sendEmail({
-      to: user.email,
-      subject: "🔐 Reset your ResumeIQ password",
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a1a; color: white; padding: 40px; border-radius: 16px;">
-          <h2 style="color: #818cf8;">Password Reset Request</h2>
-          <p>Click the button below to reset your password. This link expires in 10 minutes.</p>
-          <a href="${resetUrl}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; margin: 20px 0; font-weight: bold;">Reset Password</a>
-          <p style="color: #94a3b8; font-size: 13px;">If you didn't request this, please ignore this email.</p>
-        </div>
-      `,
-    });
+    
     res.status(200).json({ success: true, message: "Password reset link sent to your email." });
   } catch (error) {
 
