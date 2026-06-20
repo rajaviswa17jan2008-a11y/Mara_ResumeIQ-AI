@@ -60,14 +60,14 @@ if (existingUser) {
     validateBeforeSave: false
   });
 
-  //await sendEmail({
-    //to: existingUser.email,
-    //subject: "🚀 Verify your ResumeIQ account",
-    //html: `
-      //<h2>Your OTP is:</h2>
-      //<h1>${otp}</h1>
-    //`
-  //});
+  await sendEmail({
+    to: existingUser.email,
+    subject: "🚀 Verify your ResumeIQ account",
+    html: `
+      <h2>Your OTP is:</h2>
+      <h1>${otp}</h1>
+    `
+  });
 
   return res.status(200).json({
     success: true,
@@ -84,6 +84,26 @@ if (existingUser) {
   await user.save({ validateBeforeSave: false });
  
   try {
+    await sendEmail({
+      to: email,
+      subject: "🚀 Verify your ResumeIQ account",
+      html: `
+        <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a1a; color: white; border-radius: 16px; overflow: hidden;">
+          <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 40px 30px; text-align: center;">
+            <h1 style="margin: 0; font-size: 28px;">ResumeIQ AI</h1>
+            <p style="margin: 8px 0 0; opacity: 0.9;">Your AI-powered career companion</p>
+          </div>
+          <div style="padding: 40px 30px;">
+            <h2 style="color: #a78bfa;">Welcome, ${name}! 🎉</h2>
+            <p style="color: #cbd5e1;">Use the OTP below to verify your email address:</p>
+            <div style="background: #1e1b4b; border: 2px solid #6366f1; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0;">
+              <span style="font-size: 40px; font-weight: bold; letter-spacing: 12px; color: #818cf8;">${otp}</span>
+            </div>
+            <p style="color: #94a3b8; font-size: 14px;">This OTP expires in <strong>10 minutes</strong>. Do not share it with anyone.</p>
+          </div>
+        </div>
+      `,
+    });
     
   } catch (emailError) {
     console.error("Email send error:", emailError.message);
@@ -180,13 +200,13 @@ const isMatch =
     return res.status(401).json({ success: false, message: "Invalid credentials." });
   }
  
-  //if (!user.isVerified) {
-    //console.log(
-  //"IS VERIFIED =",
-  //user.isVerified
-//);
-    //return res.status(403).json({ success: false, message: "Please verify your email before logging in." });
- // }
+  if (!user.isVerified) {
+    console.log(
+  "IS VERIFIED =",
+  user.isVerified
+);
+    return res.status(403).json({ success: false, message: "Please verify your email before logging in." });
+  }
  
   user.loginAttempts = 0;
   user.lockUntil = undefined;
@@ -260,6 +280,18 @@ console.log("CLIENT_URL =", CLIENT_URL);
   const resetUrl = `${CLIENT_URL}/reset-password/${resetToken}`;
  console.log("RESET URL =", resetUrl);
   try {
+    await sendEmail({
+      to: user.email,
+      subject: "🔐 Reset your ResumeIQ password",
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a1a; color: white; padding: 40px; border-radius: 16px;">
+          <h2 style="color: #818cf8;">Password Reset Request</h2>
+          <p>Click the button below to reset your password. This link expires in 10 minutes.</p>
+          <a href="${resetUrl}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; margin: 20px 0; font-weight: bold;">Reset Password</a>
+          <p style="color: #94a3b8; font-size: 13px;">If you didn't request this, please ignore this email.</p>
+        </div>
+      `,
+    }); 
     
     res.status(200).json({ success: true, message: "Password reset link sent to your email." });
   } catch (error) {
@@ -328,13 +360,14 @@ const resendOTP = asyncHandler(async (req, res) => {
   if (user.isVerified) return res.status(400).json({ success: false, message: "Email already verified." });
  
   const otp = user.generateOTP();
+  console.log("OTP =", otp);
   await user.save({ validateBeforeSave: false });
  
-  //await sendEmail({
-    //to: user.email,
-    //subject: "🔑 New OTP - ResumeIQ",
-    //html: `<div style="font-family: sans-serif; background: #0a0a1a; color: white; padding: 30px; border-radius: 12px;"><h3>Your new OTP:</h3><div style="font-size: 36px; font-weight: bold; color: #818cf8; letter-spacing: 10px;">${otp}</div><p style="color: #94a3b8;">Expires in 10 minutes.</p></div>`,
-  //});
+  await sendEmail({
+    to: user.email,
+    subject: "🔑 New OTP - ResumeIQ",
+    html: `<div style="font-family: sans-serif; background: #0a0a1a; color: white; padding: 30px; border-radius: 12px;"><h3>Your new OTP:</h3><div style="font-size: 36px; font-weight: bold; color: #818cf8; letter-spacing: 10px;">${otp}</div><p style="color: #94a3b8;">Expires in 10 minutes.</p></div>`,
+  });
  
   res.status(200).json({ success: true, message: "New OTP sent to your email." });
 });
