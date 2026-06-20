@@ -19,10 +19,12 @@ const {
  
 // Nodemailer transporter
 const transporter = nodemailer.createTransport({
-  host: SMTP_HOST,
-  port: SMTP_PORT,
-  secure: false,
-  auth: { user: SMTP_EMAIL, pass: SMTP_PASSWORD },
+  service: "gmail",
+  auth: {
+    user: SMTP_EMAIL,
+    pass: SMTP_PASSWORD,
+  },
+  connectionTimeout: 10000,
 });
  
 const sendEmail = async ({ to, subject, html }) => {
@@ -106,7 +108,7 @@ if (existingUser) {
     });
     
   } catch (emailError) {
-    console.error("Email send error:", emailError.message);
+     console.error("SMTP ERROR =", emailError);
   }
  
   res.status(201).json({
