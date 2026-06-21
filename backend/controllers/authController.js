@@ -1,7 +1,5 @@
 const crypto = require("crypto");
 const User = require("../models/user");
-const sendTokenResponse =
-require("../utils/generateToken");
 const { asyncHandler } = require("../middleware/errorMiddleware");
 const nodemailer = require("nodemailer");
 const {
@@ -56,64 +54,19 @@ if (existingUser) {
   }
 
   // User not verified yet
-  const otp = existingUser.generateOTP();
-
-  await existingUser.save({
-    validateBeforeSave: false
-  });
-
-  await sendEmail({
-    to: existingUser.email,
-    subject: "🚀 Verify your ResumeIQ account",
-    html: `
-      <h2>Your OTP is:</h2>
-      <h1>${otp}</h1>
-    `
-  });
-
-  return res.status(200).json({
-    success: true,
-    message: "OTP resent successfully.",
-    data: {
-      userId: existingUser._id,
-      email: existingUser.email
-    }
-  });
+ return res.status(400).json({
+  success: false,
+  message: "Email already registered. Please login."
+});
 }
  
   const user = await User.create({ name, email, password });
-  const otp = user.generateOTP();
-  await user.save({ validateBeforeSave: false });
- 
-  try {
-    await sendEmail({
-      to: email,
-      subject: "🚀 Verify your ResumeIQ account",
-      html: `
-        <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a1a; color: white; border-radius: 16px; overflow: hidden;">
-          <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 40px 30px; text-align: center;">
-            <h1 style="margin: 0; font-size: 28px;">ResumeIQ AI</h1>
-            <p style="margin: 8px 0 0; opacity: 0.9;">Your AI-powered career companion</p>
-          </div>
-          <div style="padding: 40px 30px;">
-            <h2 style="color: #a78bfa;">Welcome, ${name}! 🎉</h2>
-            <p style="color: #cbd5e1;">Use the OTP below to verify your email address:</p>
-            <div style="background: #1e1b4b; border: 2px solid #6366f1; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0;">
-              <span style="font-size: 40px; font-weight: bold; letter-spacing: 12px; color: #818cf8;">${otp}</span>
-            </div>
-            <p style="color: #94a3b8; font-size: 14px;">This OTP expires in <strong>10 minutes</strong>. Do not share it with anyone.</p>
-          </div>
-        </div>
-      `,
-    });
-    
-  } catch (emailError) {
-     console.error("FULL SMTP ERROR =", emailError);
-  }
+  user.isVerified = true;
+await user.save({ validateBeforeSave: false });
  
   res.status(201).json({
     success: true,
-    message: "Registration successful! Please verify your email.",
+    message: "Account created successfully🎉! Please login.",
     data: { userId: user._id, email: user.email },
   });
 });
@@ -121,32 +74,6 @@ if (existingUser) {
 // @desc    Verify OTP
 // @route   POST /api/auth/verify-otp
 // @access  Public
-const verifyOTP = asyncHandler(async (req, res) => {
-  const { userId, otp } = req.body;
- console.log("USER ID =", userId);
-  console.log("OTP FROM FRONTEND =", otp);
-
-  const user = await User.findById(userId)
-    .select("+otp.code +otp.expiresAt");
-     console.log("OTP FROM DB =", user?.otp?.code);
- 
-
-  if (!user) return res.status(404).json({ success: false, message: "User not found." });
- 
-  if (!user.otp?.code || String(user.otp.code) !== String(otp)) {
-    return res.status(400).json({ success: false, message: "Invalid OTP." });
-  }
- 
-  if (user.otp.expiresAt < Date.now()) {
-    return res.status(400).json({ success: false, message: "OTP has expired. Request a new one." });
-  }
- 
-  user.isVerified = true;
-  user.otp = undefined;
-  await user.save({ validateBeforeSave: false });
- 
-  sendTokenResponse(user, 200, res, "Email verified successfully! Welcome to ResumeIQ.");
-});
  
 // @desc    Login user
 // @route   POST /api/auth/login
@@ -202,14 +129,7 @@ const isMatch =
     return res.status(401).json({ success: false, message: "Invalid credentials." });
   }
  
-  if (!user.isVerified) {
-    console.log(
-  "IS VERIFIED =",
-  user.isVerified
-);
-    return res.status(403).json({ success: false, message: "Please verify your email before logging in." });
-  }
- 
+  
   user.loginAttempts = 0;
   user.lockUntil = undefined;
   user.lastActive = Date.now();
@@ -318,40 +238,7 @@ console.log("CLIENT_URL =", CLIENT_URL);
 // @desc    Reset password
 // @route   PUT /api/auth/reset-password/:resetToken
 // @access  Public
-const resetPassword = asyncHandler(async (req, res) => {
-  const resetPasswordToken = crypto.createHash("sha256").update(req.params.resetToken).digest("hex");
- 
-  const user = await User.findOne({
-    resetPasswordToken,
-    resetPasswordExpire: { $gt: Date.now() },
-  }).select("+resetPasswordToken +resetPasswordExpire");
- 
-  if (!user) {
-    return res.status(400).json({ success: false, message: "Invalid or expired reset token." });
-  }
- 
-  console.log(
-  "NEW PASSWORD =",
-  req.body.password
-);
 
-user.password = req.body.password;
-
-user.resetPasswordToken = undefined;
-user.resetPasswordExpire = undefined;
-
-await user.save();
-
-console.log(
-  "PASSWORD SAVED"
-);
- 
-  res.status(200).json({
-  success: true,
-  message:
-    "Password reset successful. Please login with your new password."
-});
-});
  
 // @desc    Resend OTP
 // @route   POST /api/auth/resend-otp
@@ -374,4 +261,11 @@ const resendOTP = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, message: "New OTP sent to your email." });
 });
  
-module.exports = { register, verifyOTP, login, logout, getMe, forgotPassword, resetPassword, resendOTP };
+module.exports = {
+ register,
+ login,
+ logout,
+ getMe,
+ forgotPassword,
+ resetPassword
+};
