@@ -108,7 +108,7 @@ if (existingUser) {
     });
     
   } catch (emailError) {
-     console.error("SMTP ERROR =", emailError);
+     console.error("FULL SMTP ERROR =", emailError);
   }
  
   res.status(201).json({
