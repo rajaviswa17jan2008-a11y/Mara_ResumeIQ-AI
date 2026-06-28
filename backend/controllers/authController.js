@@ -1,33 +1,14 @@
 const crypto = require("crypto");
 const User = require("../models/user");
 const { asyncHandler } = require("../middleware/errorMiddleware");
-const nodemailer = require("nodemailer");
 const {
-
-  SMTP_HOST,
-  SMTP_PORT,
-  SMTP_EMAIL,
-  SMTP_PASSWORD,
-  FROM_EMAIL,
-  FROM_NAME,
   CLIENT_URL,
   JWT_SECRET
 
 } = require("../config/env");
  
 // Nodemailer transporter
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: SMTP_EMAIL,
-    pass: SMTP_PASSWORD,
-  },
-  connectionTimeout: 10000,
-});
  
-const sendEmail = async ({ to, subject, html }) => {
-  await transporter.sendMail({ from: `"${FROM_NAME}" <${FROM_EMAIL}>`, to, subject, html });
-};
  
 // @desc    Register user
 // @route   POST /api/auth/register
@@ -201,38 +182,7 @@ console.log("CLIENT_URL =", CLIENT_URL);
  
   const resetUrl = `${CLIENT_URL}/reset-password/${resetToken}`;
  console.log("RESET URL =", resetUrl);
-  try {
-    await sendEmail({
-      to: user.email,
-      subject: "🔐 Reset your ResumeIQ password",
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a1a; color: white; padding: 40px; border-radius: 16px;">
-          <h2 style="color: #818cf8;">Password Reset Request</h2>
-          <p>Click the button below to reset your password. This link expires in 10 minutes.</p>
-          <a href="${resetUrl}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; margin: 20px 0; font-weight: bold;">Reset Password</a>
-          <p style="color: #94a3b8; font-size: 13px;">If you didn't request this, please ignore this email.</p>
-        </div>
-      `,
-    }); 
-    
-    res.status(200).json({ success: true, message: "Password reset link sent to your email." });
-  } catch (error) {
-
-  console.error("EMAIL ERROR:", error);
-
-  user.resetPasswordToken = undefined;
-  user.resetPasswordExpire = undefined;
-
-  await user.save({
-    validateBeforeSave: false
-  });
-
-  return res.status(500).json({
-    success: false,
-    message: error.message
-  });
-
-}
+ 
 });
  
 // @desc    Reset password
@@ -243,23 +193,7 @@ console.log("CLIENT_URL =", CLIENT_URL);
 // @desc    Resend OTP
 // @route   POST /api/auth/resend-otp
 // @access  Public
-const resendOTP = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.body.userId);
-  if (!user) return res.status(404).json({ success: false, message: "User not found." });
-  if (user.isVerified) return res.status(400).json({ success: false, message: "Email already verified." });
- 
-  const otp = user.generateOTP();
-  console.log("OTP =", otp);
-  await user.save({ validateBeforeSave: false });
- 
-  await sendEmail({
-    to: user.email,
-    subject: "🔑 New OTP - ResumeIQ",
-    html: `<div style="font-family: sans-serif; background: #0a0a1a; color: white; padding: 30px; border-radius: 12px;"><h3>Your new OTP:</h3><div style="font-size: 36px; font-weight: bold; color: #818cf8; letter-spacing: 10px;">${otp}</div><p style="color: #94a3b8;">Expires in 10 minutes.</p></div>`,
-  });
- 
-  res.status(200).json({ success: true, message: "New OTP sent to your email." });
-});
+
  
 module.exports = {
  register,
@@ -267,5 +201,5 @@ module.exports = {
  logout,
  getMe,
  forgotPassword,
- resetPassword
+
 };
