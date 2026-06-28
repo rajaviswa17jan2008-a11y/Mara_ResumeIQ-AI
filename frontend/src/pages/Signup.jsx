@@ -13,11 +13,6 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [showOTP, setShowOTP] = useState(false);
-
-const [otp, setOtp] = useState("");
-
-const [userId, setUserId] = useState("");
   const [form, setForm] = useState({
   name: "", email: "", password: "", confirmPassword: "",
     jobTitle: "", experience: "", plan: "free"
@@ -40,11 +35,9 @@ const [userId, setUserId] = useState("");
 
     if (result.success) {
 
-  setUserId(
-    result.data.userId
-  );
+  alert("Account created successfully!");
 
-  setShowOTP(true);
+  navigate("/login");
 
 }
 
@@ -62,32 +55,7 @@ const [userId, setUserId] = useState("");
   }
 
 };  
-const handleVerifyOTP =
-  async () => {
-
-    try {
-
-      await authAPI.verifyOTP({
-        userId,
-        otp
-      });
-
-      alert(
-        "Email Verified Successfully"
-      );
-
-      navigate("/login");
-
-    } catch (err) {
-
-      setError(
-        err.response?.data?.message ||
-        "Invalid OTP"
-      );
-
-    }
-
-};                                                      
+                                                      
   const plans = [
     { id: "free", name: "Free", price: "$0", features: ["3 Resume Scans/mo", "Basic ATS Score", "Job Board Access"] },
     { id: "pro", name: "Pro", price: "$19", features: ["Unlimited Scans", "AI Skill Coach", "Interview Prep", "Career Chatbot"] },
@@ -327,52 +295,9 @@ shadow-[0_0_20px_rgba(0,0,0,0.15)]
                   </div>
                 ))}
                 {error && <p className="text-red-400 text-sm">{error}</p>}
-                {showOTP && (
-
-  <div className="space-y-4 mt-6">
-
-    <input
-      type="text"
-      placeholder="Enter OTP"
-      value={otp}
-      onChange={(e) =>
-        setOtp(e.target.value)
-      }
-      className="
-      w-full
-      bg-white/5
-      border
-      border-cyan-400/20
-      rounded-xl
-      py-3
-      px-4
-      text-white
-      "
-    />
-
-    <button
-      onClick={handleVerifyOTP}
-      className="
-      w-full
-      py-4
-      rounded-2xl
-
-      bg-gradient-to-r
-      from-green-500
-      to-cyan-500
-
-      text-white
-      font-bold
-      "
-    >
-      Verify OTP
-    </button>
-
-  </div>
-
-)}
-               {!showOTP && (
-                <>
+                
+              
+              <>
 
 <button
   onClick={handleSubmit} 
@@ -405,7 +330,7 @@ shadow-[0_0_20px_rgba(0,0,0,0.15)]
 </button>
                 <p className="text-center text-white/40 text-sm">Already have an account? <Link to="/login" className="text-indigo-400 hover:text-indigo-300">Sign in</Link></p>
       </>
-  )}
+  
               </motion.div>
         </div>
       </motion.div>

@@ -67,16 +67,7 @@ export const authAPI = {
   login:          (data)    => api.post('/auth/login', data),
   register:       (data)    => api.post('/auth/register', data),
   getMe:          (token)   => api.get('/auth/me', { headers: { Authorization: `Bearer ${token}` } }),
-verifyOTP: (data) =>
-    api.post('/auth/verify-otp', data),
-  forgotPassword: (data)    => api.post('/auth/forgot-password', data),
- 
 
-resetPassword: (token, data) =>
-  api.put(
-    `/auth/reset-password/${token}`,
-    data
-  ),
  changePassword: (data) =>
   api.put(
     "/users/change-password",
